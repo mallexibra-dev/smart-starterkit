@@ -37,5 +37,8 @@
   },
   "peerDependencies": {
     "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "mysql2": "^3.14.5"
   }
 }

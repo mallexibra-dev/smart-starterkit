@@ -1,4 +1,5 @@
 export type ApiResponse = {
+  data?: any;
   message: string;
-  success: true;
+  success: boolean;
 }

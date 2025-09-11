@@ -1,18 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import mysql from 'mysql2/promise';
 
-declare global {
-  // Agar tidak membuat instance PrismaClient baru setiap kali reload di development
-  // @ts-ignore
-  var prisma: PrismaClient | undefined
-}
-
-export const db =
-  global.prisma ||
-  new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-  })
-
-if (process.env.NODE_ENV !== 'production') {
-  // @ts-ignore
-  global.prisma = db
-}
+export const db = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'mydatabase',
+});
