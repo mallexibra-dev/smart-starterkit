@@ -5,19 +5,18 @@ import type { ApiResponse } from "shared";
 import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
+import { SERVER_URL } from "@/config/route";
 
 export const Route = createFileRoute("/")({
 	component: Index,
 });
-
-const SERVER_URL = import.meta.env.API_URL || "http://localhost:3000";
 
 function Index() {
 	const [data, setData] = useState<ApiResponse | undefined>();
 
 	const { mutate: sendRequest } = useMutation({
 		mutationFn: async () => {
-		  const res = await api.get<ApiResponse>(`${SERVER_URL}/hello`);
+		  const res = await api.get<ApiResponse>(`${SERVER_URL}/api/users`);
 		  return res.data;
 		},
 		onSuccess: (res) => {
