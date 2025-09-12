@@ -16,6 +16,7 @@
 - **🌐 Axios** - HTTP client untuk API calls
 - **🎯 TypeScript** - Type safety di seluruh project
 - **🎨 shadcn/ui** - Beautiful & accessible UI components
+- **🗄️ MySQL** - Database dengan connection pooling
 
 ##  Struktur Project
 
@@ -28,13 +29,15 @@ smart-starterkit/
 │   │   │       └── 📄 button.tsx
 │   │   ├── 📁 routes/            # TanStack Router
 │   │   │   ├── 📄 __root.tsx
-│   │   │   └── 📄 index.tsx
+│   │   │   ├── 📄 index.tsx
+│   │   │   └── 📁 users/         # User routes
 │   │   ├── 📁 lib/               # Utility functions
 │   │   │   ├── 📄 axios.ts       # HTTP client config
 │   │   │   └── 📄 utils.ts       # Helper functions
 │   │   ├── 📁 assets/            # Static assets
 │   │   ├── 📄 main.tsx           # App entry point
 │   │   ├── 📄 index.css          # Global styles
+│   │   └── 📄 routeTree.gen.ts   # Generated route tree
 │   ├── 📁 public/                # Public assets
 │   ├── 📁 dist/                  # Build output
 │   ├── 📁 node_modules/          # Dependencies
@@ -50,19 +53,17 @@ smart-starterkit/
 │   │   ├── 📁 route/             # API routes
 │   │   │   └── 📄 index.ts
 │   │   ├── 📁 controller/        # Route controllers
-│   │   │   └── �� example.controller.ts
+│   │   │   └── 📄 users.controller.ts
 │   │   ├── 📁 service/           # Business logic
-│   │   │   └── 📄 example.service.ts
+│   │   │   └── 📄 users.service.ts
 │   │   ├── 📁 validation/        # Request validation
-│   │   │   └── 📄 zod.validation.ts
+│   │   │   └── 📄 users.validation.ts
 │   │   └── 📄 index.ts           # Server entry point
 │   ├── 📁 database/              # Database files
-│   │   └── 📄 query.sql
-│   ├── 📁 prisma/                # Prisma ORM
-│   │   └── 📄 schema.prisma
+│   │   └── 📄 query.sql          # SQL query
 │   ├── 📁 utils/                 # Server utilities
 │   │   ├── 📄 enums.ts
-│   │   └── 📄 db.ts
+│   │   └── 📄 db.ts              # MySQL connection
 │   ├── 📁 dist/                  # Build output
 │   ├── 📄 package.json           # Server dependencies
 │   └── 📄 README.md              # Server documentation
@@ -105,7 +106,8 @@ Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder 
 ### Backend (Server)
 - **Hono** - Lightweight web framework
 - **Bun** - Fast JavaScript runtime
-- **Prisma** - Modern database ORM
+- **MySQL** - Relational database
+- **mysql2** - MySQL client dengan connection pooling
 - **Zod** - Runtime type validation
 - **TypeScript** - Type safety
 
@@ -119,6 +121,7 @@ Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder 
 ### Prerequisites
 - **Bun** v1.2.4 atau lebih baru
 - **Node.js** (opsional, untuk compatibility)
+- **MySQL** database server
 
 ### Installation
 
@@ -133,6 +136,17 @@ Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder 
    bun install
    ```
    > Perintah ini akan otomatis menginstall semua dependencies di workspace (client, server, shared)
+
+3. **Setup database**
+   ```bash
+   # Buat database MySQL
+   mysql -u root -p
+   CREATE DATABASE mydatabase;
+   
+   # Jalankan schema dan seed data
+   mysql -u root -p mydatabase < server/database/query.sql
+   ```
+
 
 3. **Setup environment variables**
    ```bash
@@ -196,8 +210,19 @@ CLERK_PUBLISHABLE_KEY=your_clerk_key
 ```env
 PORT=3000
 CLERK_SECRET_KEY=your_clerk_secret
-DATABASE_URL=your_database_url
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=mydatabase
 ```
+
+### Database Configuration
+Project menggunakan **MySQL** dengan connection pooling:
+- Database schema didefinisikan di `server/database/query.sql`
+- Connection pool dikonfigurasi di `server/utils/db.ts`
+- Support untuk soft delete dengan `deleted_at` column
+
 
 ### Workspace Configuration
 Project ini menggunakan **Bun workspaces** untuk mengelola dependencies:
