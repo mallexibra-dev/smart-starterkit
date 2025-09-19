@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "bun --watch run src/index.ts"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-openapi": "^1.1.0",
+    "@prisma/client": "^6.15.0",
+    "hono": "^4.9.7",
+    "mysql2": "^3.11.3",
+    "prisma": "^6.15.0",
+    "shared": "workspace:*",
+    "winston": "^3.17.0",
+    "zod": "^4.1.8"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
