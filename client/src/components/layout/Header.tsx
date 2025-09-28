@@ -51,7 +51,7 @@ export const Header = ({
             >
               <span
                 className={`${
-                  isDarkMode ? "translate-x-6" : "translate-x-1"
+                  isDarkMode ? "translate-x-7" : "translate-x-1"
                 } inline-block h-4 w-4 transform rounded-full bg-white shadow-lg transition-transform duration-300 ease-in-out`}
               />
               <Moon className="absolute left-[6px] w-2.5 h-2.5 text-purple-600 dark:text-purple-300" />
