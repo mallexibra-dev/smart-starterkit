@@ -112,7 +112,7 @@ export const Navbar = () => {
           {/* Management Section - Hide when collapsed */}
           {!isCollapsed && (
             <div className="space-y-3 transition-all duration-300">
-              <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3 font-semibold">
+              <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3">
                 Management
               </h3>
               
