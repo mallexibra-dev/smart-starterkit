@@ -3,7 +3,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FormCard } from "@/blocks/FormCard";
+import { FormCard } from "@/components/blocks/FormCard";
 
 // Schema untuk form user
 const userSchema = z.object({

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TableCard } from "@/blocks/TableCard";
+import { TableCard } from "@/components/blocks/TableCard";
 
 // Data contoh untuk tabel
 const users = [

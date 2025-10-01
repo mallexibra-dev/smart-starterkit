@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { UserForm } from "./-components/UserForm";
 import { UserTable } from "./-components/UserTable";
-import { StatsCards } from "@/blocks/StatsCards";
+import { StatsCards } from "@/components/blocks/StatsCards";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,7 +23,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   const handleAddData = () => {
     console.log("Menambahkan data baru...");
-    // Logic untuk menambahkan data baru
   };
 
   return (

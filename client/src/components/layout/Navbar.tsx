@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { 
   Home, 
   Package, 
-  Users, 
   Settings, 
   BarChart3, 
   FileText,
@@ -19,7 +18,7 @@ export const Navbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(path + "/");
   };
 
   const toggleNavbar = () => {
@@ -74,7 +73,7 @@ export const Navbar = () => {
                       : 'hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20'
                   }`}
                 >
-                  <Home className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/') ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'}`} />
+                  <Home className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
                   {!isCollapsed && <span className="transition-opacity duration-300">Dashboard</span>}
                 </Button>
               </Link>
@@ -88,127 +87,53 @@ export const Navbar = () => {
                       : 'hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20'
                   }`}
                 >
-                  <BarChart3 className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/analytics') ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'}`} />
+                  <BarChart3 className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/analytics') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
                   {!isCollapsed && <span className="transition-opacity duration-300">Analytics</span>}
-                </Button>
-              </Link>
-
-              <Link to={"/users" as any} title={isCollapsed ? "Users" : ""}>
-                <Button 
-                  variant="ghost" 
-                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start px-3'} h-12 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800/30 transition-all duration-200 rounded-xl group ${
-                    isActive('/users') 
-                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-600 hover:to-purple-700' 
-                      : 'hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20'
-                  }`}
-                >
-                  <Users className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/users') ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'}`} />
-                  {!isCollapsed && <span className="transition-opacity duration-300">Users</span>}
                 </Button>
               </Link>
             </div>
           </div>
 
-          {/* Management Section - Hide when collapsed */}
+          {/* Master Data & Productions */}
           {!isCollapsed && (
             <div className="space-y-3 transition-all duration-300">
               <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3">
-                Management
+                Master Data
               </h3>
-              
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="master-item" className="border-none">
-                  <AccordionTrigger 
-                    value="master-item" 
-                    className="px-3 py-3 h-12 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800/30 transition-all duration-200 rounded-xl group hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20"
+              <div className="ml-2 space-y-1">
+                <Link to={"/products" as any}>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
+                      isActive('/products') 
+                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
+                        : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
+                    }`}
                   >
-                    <div className="flex items-center">
-                      <Package className="w-5 h-5 mr-3 text-purple-500 group-hover:text-purple-600 transition-colors" />
-                      Master Data
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-0">
-                    <div className="ml-8 space-y-1">
-                      <Link to={"/products" as any}>
-                        <Button 
-                          variant="ghost" 
-                          className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
-                            isActive('/products') 
-                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
-                              : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                          }`}
-                        >
-                          Products
-                        </Button>
-                      </Link>
-                      <Link to={"/categories" as any}>
-                        <Button 
-                          variant="ghost" 
-                          className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
-                            isActive('/categories') 
-                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
-                              : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                          }`}
-                        >
-                          Categories
-                        </Button>
-                      </Link>
-                      <Link to={"/suppliers" as any}>
-                        <Button 
-                          variant="ghost" 
-                          className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
-                            isActive('/suppliers') 
-                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
-                              : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                          }`}
-                        >
-                          Suppliers
-                        </Button>
-                      </Link>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                    <Package className={`w-4 h-4 mr-2 transition-colors ${isActive('/products') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
+                    Products
+                  </Button>
+                </Link>
+              </div>
 
-                <AccordionItem value="reports-item" className="border-none">
-                  <AccordionTrigger 
-                    value="reports-item" 
-                    className="px-3 py-3 h-12 text-gray-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-800/30 transition-all duration-200 rounded-xl group hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20"
+              <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3">
+                Productions
+              </h3>
+              <div className="ml-2 space-y-1">
+                <Link to={"/transactions" as any}>
+                  <Button 
+                    variant="ghost" 
+                    className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
+                      isActive('/transactions') 
+                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
+                        : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
+                    }`}
                   >
-                    <div className="flex items-center">
-                      <FileText className="w-5 h-5 mr-3 text-purple-500 group-hover:text-purple-600 transition-colors" />
-                      Reports
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-0">
-                    <div className="ml-8 space-y-1">
-                      <Link to={"/reports/sales" as any}>
-                        <Button 
-                          variant="ghost" 
-                          className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
-                            isActive('/reports/sales') 
-                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
-                              : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                          }`}
-                        >
-                          Sales Report
-                        </Button>
-                      </Link>
-                      <Link to={"/reports/inventory" as any}>
-                        <Button 
-                          variant="ghost" 
-                          className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-200 rounded-lg group ${
-                            isActive('/reports/inventory') 
-                              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25' 
-                              : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                          }`}
-                        >
-                          Inventory Report
-                        </Button>
-                      </Link>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                    <FileText className={`w-4 h-4 mr-2 transition-colors ${isActive('/transactions') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
+                    Transactions
+                  </Button>
+                </Link>
+              </div>
             </div>
           )}
         </div>
@@ -225,7 +150,7 @@ export const Navbar = () => {
                 : 'hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20'
             }`}
           >
-            <Settings className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/settings') ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'}`} />
+            <Settings className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/settings') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
             {!isCollapsed && <span className="transition-opacity duration-300">Settings</span>}
           </Button>
         </Link>
@@ -239,7 +164,7 @@ export const Navbar = () => {
                 : 'hover:shadow-md hover:shadow-purple-200/50 dark:hover:shadow-purple-800/20'
             }`}
           >
-            <HelpCircle className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/help') ? 'text-white' : 'text-purple-500 group-hover:text-purple-600'}`} />
+            <HelpCircle className={`w-5 h-5 ${isCollapsed ? '' : 'mr-3'} transition-colors ${isActive('/help') ? 'text-white' : 'text-purple-500 group-hover:text-white'}`} />
             {!isCollapsed && <span className="transition-opacity duration-300">Help & Support</span>}
           </Button>
         </Link>
