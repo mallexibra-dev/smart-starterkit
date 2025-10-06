@@ -1,5 +1,7 @@
 import type { Context } from 'hono'
-import { ProductService, CreateProductData, UpdateProductData, ProductFilters } from '../service/product.service'
+import { ProductService } from '../service/product.service'
+import type { CreateProductData, UpdateProductData, ProductFilters } from '../service/product.service'
+import type { PaginatedProducts } from '../service/product.service'
 
 export class ProductController {
   private productService: ProductService
@@ -20,14 +22,32 @@ export class ProductController {
       if (queryParams.maxPrice) filters.maxPrice = parseFloat(queryParams.maxPrice)
       if (queryParams.minStock) filters.minStock = parseInt(queryParams.minStock)
       if (queryParams.maxStock) filters.maxStock = parseInt(queryParams.maxStock)
+      if (queryParams.page) filters.page = parseInt(queryParams.page)
+      if (queryParams.limit) filters.limit = parseInt(queryParams.limit)
+      if (queryParams.sortBy) filters.sortBy = queryParams.sortBy
+      if (queryParams.sortOrder) filters.sortOrder = queryParams.sortOrder as 'asc' | 'desc'
 
-      const products = await this.productService.getProducts(filters)
+      // Check if pagination is requested
+      const isPaginated = filters.page !== undefined || filters.limit !== undefined
 
-      return c.json({
-        success: true,
-        message: 'Products retrieved successfully',
-        data: products,
-      }, 200)
+      if (isPaginated) {
+        const result: PaginatedProducts = await this.productService.getPaginatedProducts(filters)
+
+        return c.json({
+          success: true,
+          message: 'Products retrieved successfully',
+          data: result.data,
+          pagination: result.pagination,
+        }, 200)
+      } else {
+        const products = await this.productService.getProducts(filters)
+
+        return c.json({
+          success: true,
+          message: 'Products retrieved successfully',
+          data: products,
+        }, 200)
+      }
     } catch (error) {
       console.error('Error getting products:', error)
 

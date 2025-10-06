@@ -73,7 +73,8 @@ export class TransactionService {
       )
       
       const transactions = rows as Transaction[]
-      return transactions.length > 0 ? transactions[0] : null
+      const result = transactions.length > 0 ? transactions[0] : null
+      return result as Transaction | null
     } catch (error) {
       console.error('Error getting transaction by id:', error)
       throw new Error('Failed to retrieve transaction')
@@ -131,27 +132,27 @@ export class TransactionService {
 
   async updateTransaction(id: number, data: UpdateTransactionData): Promise<Transaction | null> {
     try {
-      const fields = []
-      const values = []
-      
+      const fields: string[] = []
+      const values: any[] = []
+
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined) {
           fields.push(`${key} = ?`)
           values.push(value)
         }
       })
-      
+
       if (fields.length === 0) {
         return await this.getTransactionById(id)
       }
-      
+
       values.push(id)
-      
+
       await db.execute(
         `UPDATE transactions SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL`,
         values
       )
-      
+
       return await this.getTransactionById(id)
     } catch (error) {
       console.error('Error updating transaction:', error)

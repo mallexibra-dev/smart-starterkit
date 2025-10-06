@@ -1,26 +1,38 @@
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TableCard } from "@/components/blocks/TableCard";
-import { listProducts, deleteProduct, type ProductDto, type ProductFilters } from "@/services/product.service";
+import { listPaginatedProducts, deleteProduct, type ProductDto, type ProductFilters, type PaginationInfo } from "@/services/product.service";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { SearchFilter } from "@/components/blocks";
 import { Link } from "@tanstack/react-router";
-import { Search, Filter, Edit, Trash2, X } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
+import { DataTable } from "@/components/blocks/Table";
+import { type TableColumn } from "@/components/blocks/Table";
 
 export function ProductTable() {
   const [items, setItems] = useState<ProductDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<ProductFilters>({});
-  const [showFilters, setShowFilters] = useState(false);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [sortBy, setSortBy] = useState<string>("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
-  const load = async (currentFilters?: ProductFilters) => {
+  const load = async (currentFilters?: ProductFilters, page: number = currentPage, currentSortBy?: string, currentSortOrder?: "asc" | "desc") => {
     setLoading(true);
     try {
-      const data = await listProducts(currentFilters || filters);
-      setItems(data);
+      const requestFilters = {
+        ...currentFilters || filters,
+        page,
+        limit: pageSize,
+        sortBy: currentSortBy || sortBy,
+        sortOrder: currentSortOrder || sortOrder
+      };
+      const result = await listPaginatedProducts(requestFilters);
+      setItems(result.data);
+      setPagination(result.pagination);
+      setCurrentPage(result.pagination.page);
     } finally {
       setLoading(false);
     }
@@ -38,210 +50,178 @@ export function ProductTable() {
   const handleFilterChange = (key: keyof ProductFilters, value: any) => {
     const newFilters = { ...filters, [key]: value || undefined };
     setFilters(newFilters);
-    load(newFilters);
+    setCurrentPage(1);
+    load(newFilters, 1);
   };
 
-  const clearFilters = () => {
-    setFilters({});
-    load({});
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    load(filters, page);
+  };
+
+  const handleSort = (sortState: any) => {
+    const column = sortState.sortBy;
+    const order = sortState.sortOrder;
+    setSortBy(column);
+    setSortOrder(order);
+    setCurrentPage(1);
+    load(filters, 1, column, order);
   };
 
   const getStatusBadge = (status: string) => {
     return (
-      <Badge variant={status === 'active' ? 'default' : 'secondary'}>
+      <Badge
+        variant={status === 'active' ? 'default' : 'secondary'}
+        className={status === 'active' ? 'bg-purple-100 text-purple-800 hover:bg-purple-200' : ''}
+      >
         {status}
       </Badge>
     );
   };
 
-  return (
-    <TableCard title="Daftar Produk" description="Data produk yang tersedia">
-      {/* Search and Filters Section */}
-      <div className="flex flex-col gap-4 mb-6">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Cari berdasarkan nama, deskripsi, atau SKU..."
-              value={filters.search || ''}
-              onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="pl-10"
-            />
+  const columns: TableColumn<ProductDto>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      sortable: true,
+      width: '80px'
+    },
+    {
+      key: 'name',
+      header: 'Nama Produk',
+      sortable: true,
+      truncate: true,
+      cellRender: (value) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+            <span className="text-purple-600 font-semibold text-xs">
+              {value.substring(0, 2).toUpperCase()}
+            </span>
           </div>
-          <Button
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2"
-          >
-            <Filter className="h-4 w-4" />
-            Filter
-          </Button>
-          {(Object.keys(filters).length > 0 && Object.values(filters).some(v => v !== undefined)) && (
-            <Button variant="ghost" onClick={clearFilters} className="flex items-center gap-2">
-              <X className="h-4 w-4" />
-              Reset
-            </Button>
-          )}
+          <div className="max-w-[200px] truncate" title={value}>
+            {value}
+          </div>
         </div>
+      )
+    },
+    {
+      key: 'sku',
+      header: 'SKU',
+      sortable: true,
+      cellRender: (value) => value || '-'
+    },
+    {
+      key: 'category',
+      header: 'Kategori',
+      sortable: true,
+      cellRender: (value) => value || '-'
+    },
+    {
+      key: 'price',
+      header: 'Harga',
+      sortable: true,
+      cellRender: (value) => (
+        <span className="font-mono">
+          Rp {value.toLocaleString('id-ID')}
+        </span>
+      )
+    },
+    {
+      key: 'stock',
+      header: 'Stok',
+      sortable: true,
+      cellRender: (value) => (
+        <span className={`font-medium ${value <= 10 ? 'text-orange-600' : 'text-green-600'}`}>
+          {value}
+        </span>
+      )
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      sortable: true,
+      cellRender: (value) => getStatusBadge(value)
+    },
+    {
+      key: 'actions' as keyof ProductDto,
+      header: 'Aksi',
+      align: 'left',
+      cellRender: (_: any, row: ProductDto) => (
+        <div className="flex gap-2">
+          <Link to={`/products/${row.id}/edit` as any}>
+            <Button variant="outline" size="sm" className="flex items-center gap-1 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300">
+              <Edit className="h-3 w-3" />
+              Edit
+            </Button>
+          </Link>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" className="flex items-center gap-1">
+                <Trash2 className="h-3 w-3" />
+                Hapus
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Konfirmasi Hapus Produk</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin menghapus produk "{row.name}"?
+                  Tindakan ini tidak dapat dibatalkan.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleDelete(row.id)}>
+                  Hapus
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )
+    }
+  ];
 
-        {/* Advanced Filters */}
-        {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg bg-gray-50">
-            <div>
-              <label className="text-sm font-medium mb-2 block">Kategori</label>
-              <Input
-                placeholder="Electronics"
-                value={filters.category || ''}
-                onChange={(e) => handleFilterChange('category', e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Status</label>
-              <Select value={filters.status || 'all'} onValueChange={(value) => handleFilterChange('status', value === 'all' ? undefined : value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Semua status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua status</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Harga Min</label>
-              <Input
-                type="number"
-                placeholder="0"
-                value={filters.minPrice || ''}
-                onChange={(e) => handleFilterChange('minPrice', e.target.value ? parseFloat(e.target.value) : undefined)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Harga Max</label>
-              <Input
-                type="number"
-                placeholder="999999999"
-                value={filters.maxPrice || ''}
-                onChange={(e) => handleFilterChange('maxPrice', e.target.value ? parseFloat(e.target.value) : undefined)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Stok Min</label>
-              <Input
-                type="number"
-                placeholder="0"
-                value={filters.minStock || ''}
-                onChange={(e) => handleFilterChange('minStock', e.target.value ? parseInt(e.target.value) : undefined)}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-2 block">Stok Max</label>
-              <Input
-                type="number"
-                placeholder="999999"
-                value={filters.maxStock || ''}
-                onChange={(e) => handleFilterChange('maxStock', e.target.value ? parseInt(e.target.value) : undefined)}
-              />
-            </div>
-          </div>
-        )}
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-300">Daftar Produk</h1>
+          <p className="text-gray-600">Data produk yang tersedia</p>
+        </div>
+        <Button className="bg-purple-600 hover:bg-purple-700" asChild>
+          <Link to="/products/new">New Product</Link>
+        </Button>
       </div>
 
-      {/* Results count */}
-      {!loading && (
-        <div className="text-sm text-gray-600 mb-4">
-          Menampilkan {items.length} produk
-        </div>
-      )}
+      {/* Search and Filters Section */}
+      <SearchFilter
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Nama</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Kategori</TableHead>
-              <TableHead>Harga</TableHead>
-              <TableHead>Stok</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  Memuat data...
-                </TableCell>
-              </TableRow>
-            ) : items.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
-                  Tidak ada data produk yang ditemukan
-                </TableCell>
-              </TableRow>
-            ) : (
-              items.map((p) => (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{p.id}</TableCell>
-                  <TableCell>
-                    <div className="max-w-[200px] truncate" title={p.name}>
-                      {p.name}
-                    </div>
-                  </TableCell>
-                  <TableCell>{p.sku ?? '-'}</TableCell>
-                  <TableCell>{p.category ?? '-'}</TableCell>
-                  <TableCell className="font-mono">
-                    Rp {p.price.toLocaleString('id-ID')}
-                  </TableCell>
-                  <TableCell>
-                    <span className={`font-medium ${p.stock <= 10 ? 'text-orange-600' : 'text-green-600'}`}>
-                      {p.stock}
-                    </span>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(p.status)}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Link to={`/products/${p.id}/edit` as any}>
-                        <Button variant="outline" size="sm" className="flex items-center gap-1">
-                          <Edit className="h-3 w-3" />
-                          Edit
-                        </Button>
-                      </Link>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm" className="flex items-center gap-1">
-                            <Trash2 className="h-3 w-3" />
-                            Hapus
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Konfirmasi Hapus Produk</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Apakah Anda yakin ingin menghapus produk "{p.name}"?
-                              Tindakan ini tidak dapat dibatalkan.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Batal</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(p.id)}>
-                              Hapus
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </TableCard>
+      <DataTable
+        data={items}
+        columns={columns}
+        loading={loading}
+        pagination={pagination || undefined}
+        striped={true}
+        bordered={true}
+        showHover={true}
+        onPageChange={handlePageChange}
+        onSortChange={handleSort}
+        emptyStateConfig={{
+          message: 'Tidak Ada Produk Ditemukan',
+          description: 'Produk yang Anda cari tidak tersedia. Coba ubah filter atau kata kunci pencarian.',
+          action: (
+            <Button className="bg-purple-600 hover:bg-purple-700" asChild>
+              <Link to="/products/new">New Product</Link>
+            </Button>
+          )
+        }}
+      />
+    </div>
   );
-} 
+}

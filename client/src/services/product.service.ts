@@ -41,6 +41,24 @@ export interface ProductFilters {
   maxPrice?: number;
   minStock?: number;
   maxStock?: number;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
+
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+export interface PaginatedProductsResponse {
+  data: ProductDto[];
+  pagination: PaginationInfo;
 }
 
 export type ProductDto = Product;
@@ -58,8 +76,32 @@ export async function listProducts(filters?: ProductFilters) {
   const queryString = params.toString();
   const url = queryString ? `/products?${queryString}` : "/products";
 
-  const { data } = await api.get<{ success: boolean; message: string; data: ProductDto[] }>(url);
+  const { data } = await api.get<{ success: boolean; message: string; data: ProductDto[]; pagination?: PaginationInfo }>(url);
+
+  if (data.pagination) {
+    return {
+      data: data.data,
+      pagination: data.pagination
+    } as PaginatedProductsResponse;
+  }
+
   return data.data;
+}
+
+export async function listPaginatedProducts(filters: ProductFilters & { page: number; limit: number }) {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      params.append(key, value.toString());
+    }
+  });
+
+  const { data } = await api.get<{ success: boolean; message: string; data: ProductDto[]; pagination: PaginationInfo }>(`/products?${params.toString()}`);
+
+  return {
+    data: data.data,
+    pagination: data.pagination
+  } as PaginatedProductsResponse;
 }
 
 export async function getProduct(id: number) {
