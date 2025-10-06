@@ -1,9 +1,12 @@
+import { useState } from "react";
 import { Container } from "@/components/layout/Container";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { UserForm } from "./-components/UserForm";
 import { UserTable } from "./-components/UserTable";
 import { StatsCards } from "@/components/blocks/StatsCards";
+import { LoadingWrapper } from "@/components/blocks/LoadingWrapper";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,60 +24,80 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const handleAddData = () => {
-    console.log("Menambahkan data baru...");
+  const queryClient = useQueryClient();
+
+  const addDataMutation = useMutation({
+    mutationFn: async () => {
+      // Simulate adding data since we don't have a specific service for this
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log("Data berhasil ditambahkan...");
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    },
+  });
+
+  const handleAddData = async () => {
+    try {
+      await addDataMutation.mutateAsync();
+    } catch (error) {
+      console.error("Error menambahkan data:", error);
+    }
   };
 
   return (
     <div>
       <Container>
-        <div className="space-y-6">
-          {/* Header Dashboard */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Admin</h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">Selamat datang di panel administrasi</p>
-            </div>
-            
-            {/* Alert Dialog untuk Tambah Data */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                  Tambah Data Baru
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-purple-700 dark:text-purple-300">
+        <LoadingWrapper isLoading={addDataMutation.isPending} text="Memproses data...">
+          <div className="space-y-6">
+            {/* Header Dashboard */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard Admin</h1>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">Selamat datang di panel administrasi</p>
+              </div>
+
+              {/* Alert Dialog untuk Tambah Data */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                     Tambah Data Baru
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Apakah Anda yakin ingin menambahkan data baru ke sistem? 
-                    Tindakan ini akan membuat entri baru dalam database.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction 
-                    onClick={handleAddData}
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    Ya, Tambahkan
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-purple-700 dark:text-purple-300">
+                      Tambah Data Baru
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Apakah Anda yakin ingin menambahkan data baru ke sistem?
+                      Tindakan ini akan membuat entri baru dalam database.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleAddData}
+                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                    >
+                      Ya, Tambahkan
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
 
-          {/* Cards Statistik */}
-          <StatsCards />
+            {/* Cards Statistik */}
+            <StatsCards />
 
-          {/* Form dan Tabel */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <UserForm />
-            <UserTable />
+            {/* Form dan Tabel */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <UserForm />
+              <UserTable />
+            </div>
           </div>
-        </div>
+        </LoadingWrapper>
       </Container>
     </div>
   );

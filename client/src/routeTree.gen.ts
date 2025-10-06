@@ -13,6 +13,7 @@ import { Route as R404RouteImport } from './routes/404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TransactionsIndexRouteImport } from './routes/transactions/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
+import { Route as AnalyticsIndexRouteImport } from './routes/analytics/index'
 import { Route as TransactionsNewRouteImport } from './routes/transactions/new'
 import { Route as ProductsNewRouteImport } from './routes/products/new'
 
@@ -36,6 +37,11 @@ const ProductsIndexRoute = ProductsIndexRouteImport.update({
   path: '/products/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AnalyticsIndexRoute = AnalyticsIndexRouteImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TransactionsNewRoute = TransactionsNewRouteImport.update({
   id: '/transactions/new',
   path: '/transactions/new',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/404': typeof R404Route
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
+  '/analytics': typeof AnalyticsIndexRoute
   '/products': typeof ProductsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/404': typeof R404Route
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
+  '/analytics': typeof AnalyticsIndexRoute
   '/products': typeof ProductsIndexRoute
   '/transactions': typeof TransactionsIndexRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/404': typeof R404Route
   '/products/new': typeof ProductsNewRoute
   '/transactions/new': typeof TransactionsNewRoute
+  '/analytics/': typeof AnalyticsIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/transactions/': typeof TransactionsIndexRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/products/new'
     | '/transactions/new'
+    | '/analytics'
     | '/products'
     | '/transactions'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/products/new'
     | '/transactions/new'
+    | '/analytics'
     | '/products'
     | '/transactions'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/404'
     | '/products/new'
     | '/transactions/new'
+    | '/analytics/'
     | '/products/'
     | '/transactions/'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   R404Route: typeof R404Route
   ProductsNewRoute: typeof ProductsNewRoute
   TransactionsNewRoute: typeof TransactionsNewRoute
+  AnalyticsIndexRoute: typeof AnalyticsIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   TransactionsIndexRoute: typeof TransactionsIndexRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/analytics/': {
+      id: '/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transactions/new': {
       id: '/transactions/new'
       path: '/transactions/new'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   R404Route: R404Route,
   ProductsNewRoute: ProductsNewRoute,
   TransactionsNewRoute: TransactionsNewRoute,
+  AnalyticsIndexRoute: AnalyticsIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   TransactionsIndexRoute: TransactionsIndexRoute,
 }
