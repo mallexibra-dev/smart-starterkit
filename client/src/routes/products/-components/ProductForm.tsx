@@ -6,6 +6,7 @@ import { FormCard } from "@/components/blocks/FormCard";
 import { createProduct, type CreateProductInput, type ProductDto, type UpdateProductInput } from "@/services/product.service";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { formatRupiah } from "@/lib/currency";
 
 interface ProductFormProps {
   onCreated?: () => void;
@@ -211,6 +212,9 @@ export function ProductForm({
             step="0.01"
             className={errors.price ? "border-red-500" : ""}
           />
+          {form.price > 0 && (
+            <p className="text-sm text-gray-500">{formatRupiah(form.price)}</p>
+          )}
           {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
         </div>
         <div className="space-y-2">

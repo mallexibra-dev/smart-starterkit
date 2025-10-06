@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatRupiah, formatRupiahShort } from "@/lib/currency";
 
 export const StatsCards = () => {
   return (
@@ -26,7 +27,7 @@ export const StatsCards = () => {
           <div className="h-4 w-4 text-green-600 dark:text-green-400">💰</div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-green-900 dark:text-green-100">Rp 45.2M</div>
+          <div className="text-2xl font-bold text-green-900 dark:text-green-100">{formatRupiahShort(45200000)}</div>
           <p className="text-xs text-green-600 dark:text-green-400">
             +8% dari bulan lalu
           </p>

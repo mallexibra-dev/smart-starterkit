@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FormCard } from "@/components/blocks/FormCard";
 import { createTransaction, type CreateTransactionInput } from "@/services/transaction.service";
 import { listProducts, type ProductDto } from "@/services/product.service";
+import { formatRupiah } from "@/lib/currency";
 
 export function TransactionForm({ onCreated }: { onCreated?: () => void }) {
   const [form, setForm] = useState<CreateTransactionInput>({
@@ -88,11 +89,27 @@ export function TransactionForm({ onCreated }: { onCreated?: () => void }) {
         </div>
         <div className="space-y-2">
           <Label>Harga Satuan</Label>
-          <Input type="number" value={form.unit_price} onChange={(e) => handleChange("unit_price", e.target.value)} />
+          <Input
+            type="number"
+            value={form.unit_price}
+            onChange={(e) => handleChange("unit_price", e.target.value)}
+            placeholder={formatRupiah(0)}
+          />
+          {form.unit_price > 0 && (
+            <p className="text-sm text-gray-500">{formatRupiah(form.unit_price)}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label>Total Harga</Label>
-          <Input type="number" value={form.total_price} onChange={(e) => handleChange("total_price", e.target.value)} />
+          <Input
+            type="number"
+            value={form.total_price}
+            onChange={(e) => handleChange("total_price", e.target.value)}
+            placeholder={formatRupiah(0)}
+          />
+          {form.total_price > 0 && (
+            <p className="text-sm text-gray-500">{formatRupiah(form.total_price)}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label>Status</Label>

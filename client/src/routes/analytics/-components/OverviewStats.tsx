@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnalyticsOverview } from 'shared/types';
 import { TrendingUp, TrendingDown, DollarSign, ShoppingCart, Package } from 'lucide-react';
+import { formatRupiah } from '@/lib/currency';
 
 interface OverviewStatsProps {
   data: AnalyticsOverview;
@@ -45,12 +46,7 @@ export function OverviewStats({ data, className = '' }: OverviewStatsProps) {
 
   const formatValue = (value: number, format: string) => {
     if (format === 'currency') {
-      return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(value);
+      return formatRupiah(value);
     }
     return new Intl.NumberFormat('id-ID').format(value);
   };

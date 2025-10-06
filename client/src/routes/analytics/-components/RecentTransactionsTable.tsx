@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/blocks/Table";
 import { type TableColumn } from "@/components/blocks/Table";
 import { RecentTransaction } from "shared/types";
+import { formatRupiah } from "@/lib/currency";
 
 interface RecentTransactionsTableProps {
   data: RecentTransaction[];
@@ -15,13 +16,6 @@ const statusColors = {
 };
 
 export function RecentTransactionsTable({ data }: RecentTransactionsTableProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
@@ -67,7 +61,7 @@ export function RecentTransactionsTable({ data }: RecentTransactionsTableProps) 
       sortable: true,
       cellRender: (value) => (
         <span className="font-mono text-sm">
-          {formatCurrency(value)}
+          {formatRupiah(value)}
         </span>
       )
     },

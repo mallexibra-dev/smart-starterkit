@@ -6,6 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { DataTable } from "@/components/blocks/Table";
 import { type TableColumn } from "@/components/blocks/Table";
 import { Trash2 } from "lucide-react";
+import { formatRupiah } from "@/lib/currency";
 
 export function TransactionTable() {
   const [items, setItems] = useState<TransactionDto[]>([]);
@@ -108,7 +109,7 @@ export function TransactionTable() {
       sortable: true,
       cellRender: (value) => (
         <span className="font-mono text-sm">
-          Rp {value.toLocaleString('id-ID')}
+          {formatRupiah(value)}
         </span>
       )
     },
@@ -118,7 +119,7 @@ export function TransactionTable() {
       sortable: true,
       cellRender: (value) => (
         <span className="font-mono font-semibold text-sm">
-          Rp {value.toLocaleString('id-ID')}
+          {formatRupiah(value)}
         </span>
       )
     },

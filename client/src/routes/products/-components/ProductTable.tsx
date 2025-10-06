@@ -8,6 +8,7 @@ import { Link } from "@tanstack/react-router";
 import { Edit, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/blocks/Table";
 import { type TableColumn } from "@/components/blocks/Table";
+import { formatRupiah } from "@/lib/currency";
 
 export function ProductTable() {
   const [items, setItems] = useState<ProductDto[]>([]);
@@ -122,7 +123,7 @@ export function ProductTable() {
       sortable: true,
       cellRender: (value) => (
         <span className="font-mono">
-          Rp {value.toLocaleString('id-ID')}
+          {formatRupiah(value)}
         </span>
       )
     },
