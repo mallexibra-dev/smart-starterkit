@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
 
-export interface ProductDto {
+export interface Product {
   id: number;
   name: string;
   description: string | null;
@@ -33,8 +33,32 @@ export interface UpdateProductInput {
   status?: "active" | "inactive";
 }
 
-export async function listProducts() {
-  const { data } = await api.get<{ success: boolean; message: string; data: ProductDto[] }>("/products");
+export interface ProductFilters {
+  search?: string;
+  category?: string;
+  status?: "active" | "inactive";
+  minPrice?: number;
+  maxPrice?: number;
+  minStock?: number;
+  maxStock?: number;
+}
+
+export type ProductDto = Product;
+
+export async function listProducts(filters?: ProductFilters) {
+  const params = new URLSearchParams();
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.append(key, value.toString());
+      }
+    });
+  }
+
+  const queryString = params.toString();
+  const url = queryString ? `/products?${queryString}` : "/products";
+
+  const { data } = await api.get<{ success: boolean; message: string; data: ProductDto[] }>(url);
   return data.data;
 }
 

@@ -1,5 +1,5 @@
 import type { Context } from 'hono'
-import { ProductService, CreateProductData, UpdateProductData } from '../service/product.service'
+import { ProductService, CreateProductData, UpdateProductData, ProductFilters } from '../service/product.service'
 
 export class ProductController {
   private productService: ProductService
@@ -10,8 +10,19 @@ export class ProductController {
 
   async getProducts(c: Context) {
     try {
-      const products = await this.productService.getProducts()
-      
+      const queryParams = c.req.query()
+      const filters: ProductFilters = {}
+
+      if (queryParams.search) filters.search = queryParams.search
+      if (queryParams.category) filters.category = queryParams.category
+      if (queryParams.status) filters.status = queryParams.status as 'active' | 'inactive'
+      if (queryParams.minPrice) filters.minPrice = parseFloat(queryParams.minPrice)
+      if (queryParams.maxPrice) filters.maxPrice = parseFloat(queryParams.maxPrice)
+      if (queryParams.minStock) filters.minStock = parseInt(queryParams.minStock)
+      if (queryParams.maxStock) filters.maxStock = parseInt(queryParams.maxStock)
+
+      const products = await this.productService.getProducts(filters)
+
       return c.json({
         success: true,
         message: 'Products retrieved successfully',
@@ -19,7 +30,7 @@ export class ProductController {
       }, 200)
     } catch (error) {
       console.error('Error getting products:', error)
-      
+
       return c.json({
         success: false,
         message: 'Failed to retrieve products',

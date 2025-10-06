@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { 
   Home, 
@@ -14,7 +14,22 @@ import { Link, useLocation } from "@tanstack/react-router";
 
 export const Navbar = () => {
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Initialize collapsed state from sessionStorage or default to false
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = sessionStorage.getItem('navbar-collapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Persist collapsed state to sessionStorage and prevent auto-expand on route changes
+  useEffect(() => {
+    sessionStorage.setItem('navbar-collapsed', JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
+
+  // Prevent auto-expand on route changes
+  useEffect(() => {
+    // Explicitly keep the collapsed state as is - no auto-expansion
+  }, [location.pathname]);
 
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(path + "/");
@@ -94,47 +109,49 @@ export const Navbar = () => {
           </div>
 
           {/* Master Data & Productions */}
-          {!isCollapsed && (
-            <div className="space-y-3 transition-all duration-300">
+          <div className="space-y-3 transition-all duration-300">
+            {!isCollapsed && (
               <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3">
                 Master Data
               </h3>
-              <div className="ml-2 space-y-1">
-                <Link to={"/products" as any}>
-                  <Button
-                    variant="ghost"
-                    className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 rounded-lg group cursor-pointer ${
-                      isActive('/products')
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25'
-                        : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                    }`}
-                  >
-                    <Package className={`w-4 h-4 mr-2 ${isActive('/products') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
-                    <span className={`${isActive('/products') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}>Products</span>
-                  </Button>
-                </Link>
-              </div>
+            )}
+            <div className={`${isCollapsed ? 'space-y-1' : 'ml-2 space-y-1'}`}>
+              <Link to={"/products" as any} title={isCollapsed ? "Products" : ""}>
+                <Button
+                  variant="ghost"
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start h-10'} text-sm ${isCollapsed ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400'} hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 ${isCollapsed ? 'rounded-xl h-12' : 'rounded-lg'} group cursor-pointer ${
+                    isActive('/products')
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25'
+                      : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
+                  }`}
+                >
+                  <Package className={`w-${isCollapsed ? '5 h-5' : '4 h-4'} ${isCollapsed ? '' : 'mr-2'} ${isActive('/products') ? 'text-white' : isCollapsed ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400'}`} />
+                  {!isCollapsed && <span className={`${isActive('/products') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}>Products</span>}
+                </Button>
+              </Link>
+            </div>
 
+            {!isCollapsed && (
               <h3 className="text-sm font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider px-3">
                 Productions
               </h3>
-              <div className="ml-2 space-y-1">
-                <Link to={"/transactions" as any}>
-                  <Button
-                    variant="ghost"
-                    className={`w-full justify-start h-10 text-sm text-gray-600 dark:text-gray-400 hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 rounded-lg group cursor-pointer ${
-                      isActive('/transactions')
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25'
-                        : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
-                    }`}
-                  >
-                    <FileText className={`w-4 h-4 mr-2 ${isActive('/transactions') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`} />
-                    <span className={`${isActive('/transactions') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}>Transactions</span>
-                  </Button>
-                </Link>
-              </div>
+            )}
+            <div className={`${isCollapsed ? 'space-y-1' : 'ml-2 space-y-1'}`}>
+              <Link to={"/transactions" as any} title={isCollapsed ? "Transactions" : ""}>
+                <Button
+                  variant="ghost"
+                  className={`w-full ${isCollapsed ? 'justify-center px-2' : 'justify-start h-10'} text-sm ${isCollapsed ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400'} hover:bg-purple-100 dark:hover:bg-purple-800/30 hover:text-gray-700 dark:hover:text-gray-300 transition-all duration-200 ${isCollapsed ? 'rounded-xl h-12' : 'rounded-lg'} group cursor-pointer ${
+                    isActive('/transactions')
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md shadow-purple-500/25'
+                      : 'hover:shadow-sm hover:shadow-purple-200/30 dark:hover:shadow-purple-800/10'
+                  }`}
+                >
+                  <FileText className={`w-${isCollapsed ? '5 h-5' : '4 h-4'} ${isCollapsed ? '' : 'mr-2'} ${isActive('/transactions') ? 'text-white' : isCollapsed ? 'text-gray-700 dark:text-gray-300' : 'text-gray-600 dark:text-gray-400'}`} />
+                  {!isCollapsed && <span className={`${isActive('/transactions') ? 'text-white' : 'text-gray-600 dark:text-gray-400'}`}>Transactions</span>}
+                </Button>
+              </Link>
             </div>
-          )}
+          </div>
         </div>
       </div>
 

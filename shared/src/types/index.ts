@@ -5,3 +5,4 @@ export type ApiResponse = {
 }
 
 export * from './analytics.types'
+export * from './products.types'

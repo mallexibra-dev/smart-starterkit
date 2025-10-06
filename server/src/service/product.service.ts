@@ -33,13 +33,70 @@ export interface UpdateProductData {
   status?: 'active' | 'inactive'
 }
 
+export interface ProductFilters {
+  search?: string
+  category?: string
+  status?: 'active' | 'inactive'
+  minPrice?: number
+  maxPrice?: number
+  minStock?: number
+  maxStock?: number
+}
+
 export class ProductService {
-  async getProducts(): Promise<Product[]> {
+  async getProducts(filters?: ProductFilters): Promise<Product[]> {
     try {
-      const [rows] = await db.execute(
-        'SELECT id, name, description, price, stock, category, sku, status, created_at, updated_at FROM products WHERE deleted_at IS NULL ORDER BY created_at DESC'
-      )
-      
+      let query = 'SELECT id, name, description, price, stock, category, sku, status, created_at, updated_at FROM products WHERE deleted_at IS NULL'
+      const values: any[] = []
+
+      if (filters) {
+        const conditions: string[] = []
+
+        if (filters.search) {
+          conditions.push('(name LIKE ? OR description LIKE ? OR sku LIKE ?)')
+          const searchTerm = `%${filters.search}%`
+          values.push(searchTerm, searchTerm, searchTerm)
+        }
+
+        if (filters.category) {
+          conditions.push('category = ?')
+          values.push(filters.category)
+        }
+
+        if (filters.status) {
+          conditions.push('status = ?')
+          values.push(filters.status)
+        }
+
+        if (filters.minPrice !== undefined) {
+          conditions.push('price >= ?')
+          values.push(filters.minPrice)
+        }
+
+        if (filters.maxPrice !== undefined) {
+          conditions.push('price <= ?')
+          values.push(filters.maxPrice)
+        }
+
+        if (filters.minStock !== undefined) {
+          conditions.push('stock >= ?')
+          values.push(filters.minStock)
+        }
+
+        if (filters.maxStock !== undefined) {
+          conditions.push('stock <= ?')
+          values.push(filters.maxStock)
+        }
+
+        if (conditions.length > 0) {
+          query += ' AND ' + conditions.join(' AND ')
+        }
+      }
+
+      query += ' ORDER BY created_at DESC'
+
+      const [rows] = await db.execute(query, values)
+
       return rows as Product[]
     } catch (error) {
       console.error('Error getting products:', error)
@@ -65,22 +122,31 @@ export class ProductService {
   async createProduct(data: CreateProductData): Promise<Product> {
     try {
       const { name, description, price, stock, category, sku, status = 'active' } = data
-      
+
       const [result] = await db.execute(
         'INSERT INTO products (name, description, price, stock, category, sku, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
         [name, description, price, stock, category, sku, status]
       )
-      
+
       const insertResult = result as any
       const newProduct = await this.getProductById(insertResult.insertId)
-      
+
       if (!newProduct) {
         throw new Error('Failed to retrieve created product')
       }
-      
+
       return newProduct
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating product:', error)
+
+      // Handle specific database errors
+      if (error.code === 'ER_DUP_ENTRY') {
+        if (error.message?.includes('sku')) {
+          throw new Error('Product with this SKU already exists')
+        }
+        throw new Error('Product already exists')
+      }
+
       throw new Error('Failed to create product')
     }
   }

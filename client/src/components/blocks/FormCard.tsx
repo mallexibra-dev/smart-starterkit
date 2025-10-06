@@ -6,13 +6,14 @@ interface FormCardProps {
   title: string;
   description?: string;
   children: ReactNode;
-  onSubmit?: () => void;
+  onSubmit?: (e?: React.FormEvent) => void;
   onReset?: () => void;
   submitText?: string;
   resetText?: string;
   showReset?: boolean;
   submitVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   submitClassName?: string;
+  isSubmitting?: boolean;
 }
 
 export const FormCard = ({
@@ -25,7 +26,8 @@ export const FormCard = ({
   resetText = "Reset",
   showReset = true,
   submitVariant = "default",
-  submitClassName = "bg-purple-600 hover:bg-purple-700 text-white"
+  submitClassName = "bg-purple-600 hover:bg-purple-700 text-white",
+  isSubmitting = false
 }: FormCardProps) => {
   return (
     <Card>
@@ -39,15 +41,16 @@ export const FormCard = ({
         <form onSubmit={onSubmit} className="space-y-4">
           {children}
           <div className="flex gap-2">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               variant={submitVariant}
               className={submitClassName}
+              disabled={isSubmitting}
             >
-              {submitText}
+              {isSubmitting ? "Menyimpan..." : submitText}
             </Button>
             {showReset && (
-              <Button type="button" variant="outline" onClick={onReset}>
+              <Button type="button" variant="outline" onClick={onReset} disabled={isSubmitting}>
                 {resetText}
               </Button>
             )}
