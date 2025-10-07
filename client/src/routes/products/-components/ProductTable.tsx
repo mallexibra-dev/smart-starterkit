@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Search } from "@/components/blocks/Search";
 import { StatusFilter } from "@/components/blocks/StatusFilter";
-import { StockFilter } from "@/components/blocks/StockFilter";
+import { NumberFilter } from "@/components/blocks/NumberFilter";
 import { PriceFilter } from "@/components/blocks/PriceFilter";
 import { Link } from "@tanstack/react-router";
 import { Edit, Trash2 } from "lucide-react";
@@ -313,9 +313,10 @@ export function ProductTable() {
               value={filters.status}
               onChange={handleStatusChange}
             />
-            <StockFilter
-              minStock={filters.minStock}
-              maxStock={filters.maxStock}
+            <NumberFilter
+              min={filters.minStock}
+              max={filters.maxStock}
+              preset="stock"
               onChange={handleStockChange}
             />
             <PriceFilter

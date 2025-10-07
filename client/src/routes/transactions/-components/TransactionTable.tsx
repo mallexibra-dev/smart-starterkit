@@ -1,16 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { listTransactions, deleteTransaction, type TransactionDto } from "@/services/transaction.service";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/blocks/Table";
 import { type TableColumn } from "@/components/blocks/Table";
-import { Trash2 } from "lucide-react";
+import { Search } from "@/components/blocks/Search";
+import { PriceFilter } from "@/components/blocks/PriceFilter";
+import { NumberFilter } from "@/components/blocks/NumberFilter";
+import { Trash2, X } from "lucide-react";
 import { formatRupiah } from "@/lib/currency";
 
 export function TransactionTable() {
   const [items, setItems] = useState<TransactionDto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [minPrice, setMinPrice] = useState<number | undefined>();
+  const [maxPrice, setMaxPrice] = useState<number | undefined>();
+  const [minQuantity, setMinQuantity] = useState<number | undefined>();
+  const [maxQuantity, setMaxQuantity] = useState<number | undefined>();
 
   const load = async () => {
     setLoading(true);
@@ -30,6 +38,40 @@ export function TransactionTable() {
     await deleteTransaction(id);
     load();
   };
+
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      // Search filter
+      const searchMatch = searchTerm === "" ||
+        item.id.toString().includes(searchTerm) ||
+        item.user_id.toString().includes(searchTerm) ||
+        item.product_id.toString().includes(searchTerm) ||
+        item.transaction_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.payment_method?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.created_at.includes(searchTerm);
+
+      // Price filter
+      const priceMatch = (minPrice === undefined || item.unit_price >= minPrice) &&
+        (maxPrice === undefined || item.unit_price <= maxPrice);
+
+      // Quantity filter
+      const quantityMatch = (minQuantity === undefined || item.quantity >= minQuantity) &&
+        (maxQuantity === undefined || item.quantity <= maxQuantity);
+
+      return searchMatch && priceMatch && quantityMatch;
+    });
+  }, [items, searchTerm, minPrice, maxPrice, minQuantity, maxQuantity]);
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setMinPrice(undefined);
+    setMaxPrice(undefined);
+    setMinQuantity(undefined);
+    setMaxQuantity(undefined);
+  };
+
+  const hasActiveFilters = searchTerm || minPrice !== undefined || maxPrice !== undefined || minQuantity !== undefined || maxQuantity !== undefined;
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -191,17 +233,66 @@ export function TransactionTable() {
   ];
 
   return (
-    <DataTable
-      data={items}
-      columns={columns}
-      loading={loading}
-      striped={true}
-      bordered={true}
-      showHover={true}
-      emptyStateConfig={{
-        message: 'Tidak Ada Transaksi',
-        description: 'Belum ada transaksi yang tersedia.',
-      }}
-    />
+    <div className="space-y-4">
+      {/* Filters Section */}
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          {/* Search di kiri */}
+          <div className="flex-1 max-w-md">
+            <Search
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Cari transaksi..."
+            />
+          </div>
+
+          {/* Filters di kanan */}
+          <div className="flex gap-2 items-center">
+            {/* Price Filter */}
+            <PriceFilter
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              onChange={(min, max) => {
+                setMinPrice(min);
+                setMaxPrice(max);
+              }}
+            />
+
+            {/* Quantity Filter */}
+            <NumberFilter
+              min={minQuantity}
+              max={maxQuantity}
+              preset="quantity"
+              onChange={(min, max) => {
+                setMinQuantity(min);
+                setMaxQuantity(max);
+              }}
+            />
+
+            {/* Reset Button */}
+            {hasActiveFilters && (
+              <Button variant="ghost" onClick={handleClearFilters} className="flex items-center gap-1">
+                <X className="h-4 w-4" />
+                Reset
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <DataTable
+        data={filteredItems}
+        columns={columns}
+        loading={loading}
+        striped={true}
+        bordered={true}
+        showHover={true}
+        emptyStateConfig={{
+          message: 'Tidak Ada Transaksi',
+          description: hasActiveFilters ? 'Tidak ada transaksi yang cocok dengan filter yang diterapkan.' : 'Belum ada transaksi yang tersedia.',
+        }}
+      />
+    </div>
   );
 }
