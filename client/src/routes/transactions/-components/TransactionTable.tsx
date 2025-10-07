@@ -8,6 +8,7 @@ import { type TableColumn } from "@/components/blocks/Table";
 import { Search } from "@/components/blocks/Search";
 import { PriceFilter } from "@/components/blocks/PriceFilter";
 import { NumberFilter } from "@/components/blocks/NumberFilter";
+import { Link } from "@tanstack/react-router";
 import { Trash2, X } from "lucide-react";
 import { formatRupiah } from "@/lib/currency";
 
@@ -125,14 +126,14 @@ export function TransactionTable() {
     {
       key: 'user_id',
       header: 'User ID',
-      sortable: true,
+      sortable: false,
       width: '100px',
       cellRender: (value) => `#${value}`
     },
     {
       key: 'product_id',
       header: 'Product ID',
-      sortable: true,
+      sortable: false,
       width: '120px',
       cellRender: (value) => `#${value}`
     },
@@ -233,22 +234,29 @@ export function TransactionTable() {
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Filters Section */}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+            Daftar Transaksi
+          </h1>
+          <p className="text-gray-600">Data transaksi yang tersedia</p>
+        </div>
+        <Button className="bg-purple-600 hover:bg-purple-700" asChild>
+          <Link to="/transactions/new">New Transaction</Link>
+        </Button>
+      </div>
+
+      {/* Search and Filters Section */}
       <div className="flex flex-col gap-4">
         <div className="flex justify-between items-center">
-          {/* Search di kiri */}
-          <div className="flex-1 max-w-md">
-            <Search
-              value={searchTerm}
-              onChange={setSearchTerm}
-              placeholder="Cari transaksi..."
-            />
-          </div>
-
-          {/* Filters di kanan */}
-          <div className="flex gap-2 items-center">
-            {/* Price Filter */}
+          <Search
+            value={searchTerm}
+            onChange={setSearchTerm}
+            placeholder="Cari transaksi..."
+          />
+          <div className="flex gap-3 items-center">
             <PriceFilter
               minPrice={minPrice}
               maxPrice={maxPrice}
@@ -257,8 +265,6 @@ export function TransactionTable() {
                 setMaxPrice(max);
               }}
             />
-
-            {/* Quantity Filter */}
             <NumberFilter
               min={minQuantity}
               max={maxQuantity}
@@ -268,10 +274,8 @@ export function TransactionTable() {
                 setMaxQuantity(max);
               }}
             />
-
-            {/* Reset Button */}
             {hasActiveFilters && (
-              <Button variant="ghost" onClick={handleClearFilters} className="flex items-center gap-1">
+              <Button variant="ghost" onClick={handleClearFilters} className="flex items-center gap-1 hover:bg-purple-50 hover:text-purple-700">
                 <X className="h-4 w-4" />
                 Reset
               </Button>
@@ -289,8 +293,13 @@ export function TransactionTable() {
         bordered={true}
         showHover={true}
         emptyStateConfig={{
-          message: 'Tidak Ada Transaksi',
+          message: "Tidak Ada Transaksi Ditemukan",
           description: hasActiveFilters ? 'Tidak ada transaksi yang cocok dengan filter yang diterapkan.' : 'Belum ada transaksi yang tersedia.',
+          action: (
+            <Button className="bg-purple-600 hover:bg-purple-700" asChild>
+              <Link to="/transactions/new">New Transaction</Link>
+            </Button>
+          ),
         }}
       />
     </div>
