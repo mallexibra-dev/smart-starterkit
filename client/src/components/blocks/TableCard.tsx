@@ -17,7 +17,7 @@ export const TableCard = ({
       <CardHeader>
         <CardTitle className="text-purple-700 dark:text-purple-300">{title}</CardTitle>
         {description && (
-          <CardDescription>{description}</CardDescription>
+          <CardDescription className="dark:text-gray-300">{description}</CardDescription>
         )}
       </CardHeader>
       <CardContent>

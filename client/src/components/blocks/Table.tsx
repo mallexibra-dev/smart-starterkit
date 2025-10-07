@@ -179,7 +179,7 @@ const tableContainerVariants = cva(
   {
     variants: {
       bordered: {
-        true: "border border-gray-200 rounded-lg",
+        true: "border border-gray-200 dark:border-gray-700 rounded-lg",
         false: "",
       },
     },
@@ -210,12 +210,12 @@ const tableVariants = cva(
 );
 
 const tableHeaderVariants = cva(
-  "border-b bg-gray-50/50",
+  "border-b bg-gray-50/50 dark:bg-gray-900/50",
   {
     variants: {
       bordered: {
-        true: "border-gray-200",
-        false: "border-gray-100",
+        true: "border-gray-200 dark:border-gray-700",
+        false: "border-gray-100 dark:border-gray-800",
       },
     },
     defaultVariants: {
@@ -225,11 +225,11 @@ const tableHeaderVariants = cva(
 );
 
 const tableHeaderCellVariants = cva(
-  "h-12 px-4 text-left align-middle font-medium text-gray-700",
+  "h-12 px-4 text-left align-middle font-medium text-gray-700 dark:text-gray-300",
   {
     variants: {
       sortable: {
-        true: "cursor-pointer select-none hover:bg-purple-50 transition-colors",
+        true: "cursor-pointer select-none hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors",
         false: "",
       },
       align: {
@@ -250,15 +250,15 @@ const tableRowVariants = cva(
   {
     variants: {
       striped: {
-        true: "even:bg-gray-50/25 hover:bg-gray-50",
-        false: "hover:bg-gray-50",
+        true: "even:bg-gray-50/25 dark:even:bg-gray-800/25 hover:bg-gray-50 dark:hover:bg-gray-800/50",
+        false: "hover:bg-gray-50 dark:hover:bg-gray-800/50",
       },
       selectable: {
         true: "cursor-pointer",
         false: "",
       },
       selected: {
-        true: "bg-purple-50 hover:bg-purple-100",
+        true: "bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30",
         false: "",
       },
     },
@@ -309,7 +309,7 @@ const paginationContainerVariants = cva(
 );
 
 const loadingOverlayVariants = cva(
-  "absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10",
+  "absolute inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex items-center justify-center z-10",
   {
     variants: {
       visible: {
@@ -324,7 +324,7 @@ const loadingOverlayVariants = cva(
 );
 
 const emptyStateVariants = cva(
-  "flex flex-col items-center justify-center py-16 text-gray-500",
+  "flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400",
   {
     variants: {
       compact: {
@@ -339,7 +339,7 @@ const emptyStateVariants = cva(
 );
 
 const skeletonVariants = cva(
-  "animate-pulse bg-gray-200 rounded",
+  "animate-pulse bg-gray-200 dark:bg-gray-700 rounded",
   {
     variants: {
       height: {
@@ -479,7 +479,7 @@ export function DataTable<T = any>({
         selectable,
         selected: isSelected
       }),
-      showHover && "hover:bg-gray-50",
+      showHover && "hover:bg-gray-50 dark:hover:bg-gray-800/50",
       customClass
     );
   };
@@ -515,7 +515,7 @@ export function DataTable<T = any>({
             href="#"
             onClick={() => handlePageChange(1)}
             isActive={page === 1}
-            className={page === 1 ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 hover:text-purple-700'}
+            className={page === 1 ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300'}
           >
             1
           </PaginationLink>
@@ -542,7 +542,7 @@ export function DataTable<T = any>({
             href="#"
             onClick={() => handlePageChange(i)}
             isActive={page === i}
-            className={page === i ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 hover:text-purple-700'}
+            className={page === i ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300'}
           >
             {i}
           </PaginationLink>
@@ -566,7 +566,7 @@ export function DataTable<T = any>({
             href="#"
             onClick={() => handlePageChange(totalPages)}
             isActive={page === totalPages}
-            className={page === totalPages ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 hover:text-purple-700'}
+            className={page === totalPages ? 'bg-purple-600 text-white hover:bg-purple-700' : 'hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300'}
           >
             {totalPages}
           </PaginationLink>
@@ -606,12 +606,12 @@ export function DataTable<T = any>({
       <TableRow>
         <TableCell colSpan={columns.length} className="text-center">
           <div className={cn(emptyStateVariants({ compact }))}>
-            {finalEmptyStateConfig.icon || <SearchX className="h-16 w-16 text-gray-300" />}
+            {finalEmptyStateConfig.icon || <SearchX className="h-16 w-16 text-gray-300 dark:text-gray-600" />}
             <div className="space-y-2">
-              <h3 className="text-lg font-medium text-gray-600">
+              <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">
                 {finalEmptyStateConfig.message}
               </h3>
-              <p className="text-sm text-gray-500 max-w-md">
+              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-md">
                 {finalEmptyStateConfig.description}
               </p>
               {finalEmptyStateConfig.action && (
@@ -634,7 +634,7 @@ export function DataTable<T = any>({
           <div className={cn(loadingOverlayVariants({ visible: true }))}>
             <div className="flex flex-col items-center space-y-2">
               <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {finalLoadingConfig.message}
               </span>
             </div>
@@ -713,34 +713,40 @@ export function DataTable<T = any>({
         <div className={cn(paginationContainerVariants())}>
           {paginationComponent || (
             <>
-              <div className="flex justify-center">
-                <Pagination>
-                  <PaginationContent>
-                    {generatePaginationItems()}
-                  </PaginationContent>
-                </Pagination>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                Menampilkan {Math.min((pagination!.page - 1) * pagination!.limit + 1, pagination!.total)}-{Math.min(pagination!.page * pagination!.limit, pagination!.total)} dari {pagination!.total} data
               </div>
 
-              <div className="flex">
-                <Pagination>
-                  <PaginationContent className="gap-1">
-                    <PaginationItem>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={() => handlePageChange(pagination!.page - 1)}
-                        className={!pagination!.hasPrev ? "cursor-not-allowed opacity-50" : "hover:bg-purple-50 hover:text-purple-700"}
-                      />
-                    </PaginationItem>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handlePageChange(pagination!.page - 1)}
+                  disabled={!pagination!.hasPrev}
+                  className={`p-2 rounded-md flex items-center justify-center ${!pagination!.hasPrev
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                  }`}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
 
-                    <PaginationItem>
-                      <PaginationNext
-                        href="#"
-                        onClick={() => handlePageChange(pagination!.page + 1)}
-                        className={!pagination!.hasNext ? "cursor-not-allowed opacity-50" : "hover:bg-purple-50 hover:text-purple-700"}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
+                <div className="flex items-center gap-1" style={{ listStyle: 'none' }}>
+                  {generatePaginationItems()}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(pagination!.page + 1)}
+                  disabled={!pagination!.hasNext}
+                  className={`p-2 rounded-md flex items-center justify-center ${!pagination!.hasNext
+                    ? "cursor-not-allowed opacity-50"
+                    : "hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                  }`}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
             </>
           )}
