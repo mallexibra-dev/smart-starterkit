@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
 
 interface SiteHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -49,7 +50,8 @@ export function SiteHeader({
       {...props}
     >
       <div className="container flex h-14 items-center">
-        <div className="flex items-center gap-4 mr-4">
+        {/* Left: Sidebar + Title */}
+        <div className="flex items-center gap-4 mr-auto">
           <SidebarTrigger variant="ghost" size="icon" />
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 font-semibold">
@@ -64,7 +66,9 @@ export function SiteHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-2 px-2 md:gap-4 md:px-0">
+        {/* Right: Search + Notifications + Create */}
+        <div className="flex items-center gap-2 ml-4">
+          {/* Mobile Menu Button */}
           <Button
             variant="outline"
             className="mr-2 h-8 w-8 p-0 md:hidden"
@@ -92,6 +96,9 @@ export function SiteHeader({
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
             />
           </div>
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
           {/* Notifications */}
           <DropdownMenu>

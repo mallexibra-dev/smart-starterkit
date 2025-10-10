@@ -3,8 +3,8 @@
 import * as React from "react"
 import { ReactNode } from "react"
 
-import { AppSidebar } from "@/components/blocks/app-sidebar"
-import { SiteHeader } from "@/components/blocks/site-header"
+import { AppSidebar } from "@/components/layout/app-sidebar"
+import { SiteHeader } from "@/components/layout/site-header"
 import {
   SidebarInset,
   SidebarProvider,
