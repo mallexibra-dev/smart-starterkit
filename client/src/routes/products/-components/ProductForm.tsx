@@ -81,7 +81,7 @@ export function ProductForm({
           if (value !== undefined && value !== null && value !== '') {
             // Convert price and stock to numbers for update
             if (key === 'price' || key === 'stock') {
-              updateData[key as keyof UpdateProductInput] = Number(value);
+              updateData[key as keyof UpdateProductInput] = Number(value) as any;
             } else {
               updateData[key as keyof UpdateProductInput] = value as any;
             }

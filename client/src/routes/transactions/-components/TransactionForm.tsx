@@ -33,7 +33,13 @@ export function TransactionForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    listProducts().then(setProducts);
+    listProducts().then(data => {
+      if (Array.isArray(data)) {
+        setProducts(data);
+      } else if (data && data.data) {
+        setProducts(data.data);
+      }
+    });
   }, []);
 
   const validateForm = (data: CreateTransactionType) => {
@@ -48,9 +54,9 @@ export function TransactionForm() {
       setErrors({});
       return true;
     } catch (error) {
-      if (error instanceof z.ZodError && error.errors) {
+      if (error instanceof z.ZodError && error.issues) {
         const newErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
+        error.issues.forEach((err) => {
           newErrors[err.path[0] as string] = err.message;
         });
 
