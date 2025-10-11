@@ -32,7 +32,7 @@ import { FormSearch } from "@/components/blocks/forms/form-search";
 import { FormMultiSelect } from "@/components/blocks/forms/form-multiselect";
 
 // Icons
-import { Users, Activity, DollarSign, BarChart3, CheckCircle, Wifi, Zap, Upload, Download, Eye, Edit, Trash, Heart, Play, Pause, RefreshCw, Bell, Copy, Share2, Bookmark, MessageCircle, ThumbsUp, AlertCircle, CheckCircle2, XCircle, Info, Lightbulb, Sparkles, Zap as BoltIcon } from "lucide-react";
+import { Users, Activity, DollarSign, BarChart3, CheckCircle, Wifi, Zap, Upload, Download, Eye, Edit, Trash, Heart, Play, Pause, RefreshCw, Bell, Copy, Share2, Bookmark, MessageCircle, AlertCircle, CheckCircle2, XCircle, Info, Lightbulb, Sparkles, Zap as BoltIcon } from "lucide-react";
 
 // Hooks
 import { useState } from "react";
@@ -54,6 +54,10 @@ function Index() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState(["react", "typescript", "nodejs"]);
+  const [volumeLevel, setVolumeLevel] = useState(75);
+  const [qualityLevel, setQualityLevel] = useState(80);
+  const [tags, setTags] = useState(["react", "typescript", "design"]);
   const toast = useToastHelpers();
 
   const handleLike = () => {
@@ -132,6 +136,7 @@ function Index() {
     });
   };
 
+  
   return (
     <ContainerLayout title="Design System Showcase">
         <div className="space-y-12">
@@ -930,8 +935,11 @@ function Index() {
                   { value: "graphql", label: "GraphQL", description: "API query language" },
                   { value: "kubernetes", label: "Kubernetes", description: "Container orchestration" }
                 ]}
-                value={["react", "typescript", "nodejs"]}
-                onChange={(values) => console.log("Selected skills:", values)}
+                value={selectedSkills}
+                onChange={(values) => {
+                  console.log("Selected skills:", values);
+                  setSelectedSkills(values);
+                }}
                 searchable
                 showSelectAll
               />
@@ -972,20 +980,22 @@ function Index() {
               <FormSlider
                 id="volume"
                 label="Volume Control"
-                value={[75]}
-                valueLabel="Volume: 75%"
+                value={[volumeLevel]}
+                valueLabel={`Volume: ${volumeLevel}%`}
                 min={0}
                 max={100}
+                onChange={(value) => setVolumeLevel(value[0])}
               />
 
               <FormSlider
                 id="quality"
                 label="Quality Settings"
-                value={[80]}
-                valueLabel="Quality: 80%"
+                value={[qualityLevel]}
+                valueLabel={`Quality: ${qualityLevel}%`}
                 min={0}
                 max={100}
                 step={10}
+                onChange={(value) => setQualityLevel(value[0])}
               />
             </div>
           </div>
@@ -997,7 +1007,11 @@ function Index() {
               id="tags"
               label="Tags"
               placeholder="Add a tag"
-              value={["react", "typescript", "design"]}
+              value={tags}
+              onChange={(newTags) => {
+                console.log("Tags changed:", newTags);
+                setTags(newTags);
+              }}
             />
 
             <FormFileUpload

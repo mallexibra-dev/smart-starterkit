@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
@@ -71,14 +71,18 @@ export function FormMultiSelect({
 
   const currentValue = isControlled ? value : internalValue
 
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = useMemo(() =>
+    options.filter(option =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      option.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    ), [options, searchTerm]
   )
 
-  const selectedOptions = options.filter(option => currentValue.includes(option.value))
+  const selectedOptions = useMemo(() =>
+    options.filter(option => currentValue.includes(option.value)), [options, currentValue]
+  )
 
-  const handleSelect = (optionValue: string) => {
+  const handleSelect = useCallback((optionValue: string) => {
     const newValue = currentValue.includes(optionValue)
       ? currentValue.filter(v => v !== optionValue)
       : [...currentValue, optionValue]
@@ -87,9 +91,9 @@ export function FormMultiSelect({
       setInternalValue(newValue)
     }
     onChange?.(newValue)
-  }
+  }, [currentValue, isControlled, onChange])
 
-  const handleSelectAll = () => {
+  const handleSelectAll = useCallback(() => {
     const filteredValues = filteredOptions
       .filter(option => !option.disabled)
       .map(option => option.value)
@@ -103,36 +107,49 @@ export function FormMultiSelect({
       setInternalValue(newValue)
     }
     onChange?.(newValue)
-  }
+  }, [filteredOptions, currentValue, isControlled, onChange])
 
-  const handleRemove = (optionValue: string) => {
+  const handleRemove = useCallback((optionValue: string) => {
     const newValue = currentValue.filter(v => v !== optionValue)
-    if (value.length === 0) {
+    if (!isControlled) {
       setInternalValue(newValue)
     }
     onChange?.(newValue)
-  }
+  }, [currentValue, isControlled, onChange])
 
-  const handleClear = () => {
-    if (value.length === 0) {
+  const handleClear = useCallback(() => {
+    if (!isControlled) {
       setInternalValue([])
     }
     onChange?.([])
-  }
+  }, [isControlled, onChange])
 
-  const isAllSelected = filteredOptions
-    .filter(option => !option.disabled)
-    .every(option => currentValue.includes(option.value))
+  const isAllSelected = useMemo(() =>
+    filteredOptions
+      .filter(option => !option.disabled)
+      .every(option => currentValue.includes(option.value)), [filteredOptions, currentValue]
+  )
 
-  const isIndeterminate = filteredOptions
-    .filter(option => !option.disabled)
-    .some(option => currentValue.includes(option.value)) && !isAllSelected
+  const isIndeterminate = useMemo(() =>
+    filteredOptions
+      .filter(option => !option.disabled)
+      .some(option => currentValue.includes(option.value)) && !isAllSelected, [filteredOptions, currentValue, isAllSelected]
+  )
 
   useEffect(() => {
     if (open && searchable) {
-      setTimeout(() => inputRef.current?.focus(), 0)
+      const timer = requestAnimationFrame(() => {
+        inputRef.current?.focus()
+      })
+      return () => cancelAnimationFrame(timer)
     }
   }, [open, searchable])
+
+  useEffect(() => {
+    if (isControlled && value !== undefined) {
+      setInternalValue(value)
+    }
+  }, [value, isControlled])
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -245,28 +262,30 @@ export function FormMultiSelect({
                     disabled={option.disabled}
                     className="flex cursor-pointer"
                   >
-                    <div className="flex items-center flex-1">
+                    <div className="flex items-center flex-1 min-w-0">
                       <Checkbox
                         checked={isSelected}
                         disabled={option.disabled}
+                        onCheckedChange={() => handleSelect(option.value)}
                         aria-label={`Select ${option.label}`}
+                        onClick={(e) => e.stopPropagation()}
                       />
-                      <div className="ml-2 flex-1">
+                      <div className="ml-2 flex-1 min-w-0">
                         <div className={cn(
-                          "font-medium",
+                          "font-medium truncate",
                           option.disabled && "opacity-50"
                         )}>
                           {option.label}
                         </div>
                         {option.description && (
-                          <div className="text-sm text-muted-foreground">
+                          <div className="text-sm text-muted-foreground truncate">
                             {option.description}
                           </div>
                         )}
                       </div>
                     </div>
                     {isSelected && (
-                      <Check className="ml-2 h-4 w-4" />
+                      <Check className="ml-2 h-4 w-4 flex-shrink-0" />
                     )}
                   </CommandItem>
                 )
