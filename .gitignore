@@ -1,4 +1,6 @@
-# bhvr/.gitignore
+# ai training
+.claude
+.cursor
 
 # logs
 server/logs

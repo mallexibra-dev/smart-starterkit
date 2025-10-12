@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Navbar = ({ children }: { children: React.ReactNode }) => {
   return (
     <nav>
