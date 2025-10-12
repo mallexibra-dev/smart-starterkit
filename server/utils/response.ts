@@ -1,6 +1,8 @@
-import { Context } from "hono";
+import { HttpMessage, STATUS_MESSAGE_MAP } from "@server/enums/response.enum";
+import type { Context } from "hono";
+import type { StatusCode } from "hono/utils/http-status";
 
-// Interface untuk success response
+// Interface for a successful response payload
 interface SuccessResponse<T = any> {
   success: true;
   message: string;
@@ -13,7 +15,7 @@ interface SuccessResponse<T = any> {
   };
 }
 
-// Interface untuk error response
+// Interface for an error response payload
 interface ErrorResponse {
   success: false;
   message: string;
@@ -22,18 +24,25 @@ interface ErrorResponse {
 }
 
 /**
- * Response success
+ * Get the default message for a given HTTP status code
+ */
+const getDefaultMessage = (statusCode: number): string => {
+  return STATUS_MESSAGE_MAP[statusCode] || HttpMessage.OK;
+};
+
+/**
+ * Send a standardized success response
  */
 export const successResponse = <T = any>(
   c: Context,
-  message: string,
+  message?: string,
   data?: T,
-  statusCode: import("hono/utils/http-status").ContentfulStatusCode = 200,
+  statusCode: StatusCode = 200,
   meta?: SuccessResponse<T>["meta"],
 ) => {
   const response: SuccessResponse<T> = {
     success: true,
-    message,
+    message: message || getDefaultMessage(statusCode),
     ...(data !== undefined && { data }),
     ...(meta && { meta }),
   };
@@ -43,18 +52,18 @@ export const successResponse = <T = any>(
 };
 
 /**
- * Response error
+ * Send a standardized error response
  */
 export const errorResponse = (
   c: Context,
-  message: string,
-  statusCode: number = 500,
+  message?: string,
+  statusCode: StatusCode = 500,
   errors?: any,
   stack?: string,
 ) => {
   const response: ErrorResponse = {
     success: false,
-    message,
+    message: message || getDefaultMessage(statusCode),
     ...(errors && { errors }),
     ...(stack && process.env.NODE_ENV === "development" && { stack }),
   };
