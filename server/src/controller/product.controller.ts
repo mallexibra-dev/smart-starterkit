@@ -237,7 +237,7 @@ export class ProductController {
     try {
       const category = c.req.param('category')
       const query = ProductQuery.parse(c.req.query())
-      query.category = category
+      query.category_slug = category
 
       const result = await this.productService.getProducts(query)
 

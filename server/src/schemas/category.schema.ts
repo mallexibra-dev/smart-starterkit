@@ -1,7 +1,8 @@
 import { z } from '@hono/zod-openapi'
 import { BaseOk } from './base.schema'
+import type { Category as CategoryType } from '../../../shared/src/types/products.type'
 
-// Category schema
+// Category schema that matches shared types with OpenAPI documentation
 export const Category = z.object({
   id: z.number().openapi({ example: 1 }),
   name: z.string().openapi({ example: 'Electronics' }),
@@ -13,7 +14,7 @@ export const Category = z.object({
   status: z.enum(['active', 'inactive']).openapi({ example: 'active' }),
   created_at: z.string().openapi({ example: '2024-01-01T00:00:00.000Z' }),
   updated_at: z.string().nullable().openapi({ example: '2024-01-01T00:00:00.000Z' }),
-}).openapi('Category')
+}).openapi('Category') as z.ZodType<CategoryType>
 
 // Schema for creating category
 export const CreateCategory = z.object({

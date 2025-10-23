@@ -1,87 +1,12 @@
 import { db } from '../../utils/db'
-
-export interface Category {
-  id: number
-  name: string
-  slug: string
-  description: string | null
-  icon: string | null
-  color: string | null
-  sort_order: number
-  status: 'active' | 'inactive'
-  created_at: string
-  updated_at: string | null
-}
-
-export interface Product {
-  id: number
-  name: string
-  description: string | null
-  price: number
-  category_id: number
-  category: Category | null
-  status: string
-  sku: string
-  stock_quantity: number
-  min_stock_level: number
-  weight: number | null
-  dimensions: string | null
-  images: string[] | null
-  tags: string[] | null
-  created_at: string
-  updated_at: string | null
-}
-
-export interface CreateProductData {
-  name: string
-  description?: string
-  price: number
-  category_id: number
-  status?: string
-  sku: string
-  stock_quantity?: number
-  min_stock_level?: number
-  weight?: number
-  dimensions?: string
-  images?: string[]
-  tags?: string[]
-}
-
-export interface UpdateProductData {
-  name?: string
-  description?: string
-  price?: number
-  category_id?: number
-  status?: string
-  sku?: string
-  stock_quantity?: number
-  min_stock_level?: number
-  weight?: number
-  dimensions?: string
-  images?: string[]
-  tags?: string[]
-}
-
-export interface ProductQuery {
-  page: number
-  limit: number
-  category_id?: number
-  category_slug?: string
-  status?: string
-  search?: string
-  sort_by: string
-  sort_order: string
-}
-
-export interface ProductListResponse {
-  data: Product[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    total_pages: number
-  }
-}
+import type {
+  Category,
+  Product,
+  CreateProductData,
+  UpdateProductData,
+  ProductQuery,
+  ProductListResponse
+} from '../../../shared/src/types/products.type'
 
 export class ProductService {
   async getProducts(query: ProductQuery): Promise<ProductListResponse> {
@@ -134,11 +59,12 @@ export class ProductService {
       const sortColumn = query.sort_by === 'name' ? 'p.name' :
                         query.sort_by === 'price' ? 'p.price' :
                         query.sort_by === 'updated_at' ? 'p.updated_at' : 'p.created_at'
-      sql += ` ORDER BY ${sortColumn} ${query.sort_order.toUpperCase()}`
+      sql += ` ORDER BY ${sortColumn} ${(query.sort_order || 'desc').toUpperCase()}`
 
       // Add pagination
-      const offset = (query.page - 1) * query.limit
-      const limit = Number(query.limit)
+      const page = Number(query.page || 1)
+      const limit = Number(query.limit || 10)
+      const offset = (page - 1) * limit
       const offsetNum = Number(offset)
 
       // Use template literals for LIMIT and OFFSET to avoid parameter binding issues

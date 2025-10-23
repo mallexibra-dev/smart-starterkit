@@ -1,16 +1,16 @@
-const ProductStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
-  DRAFT: 'draft',
-  ARCHIVED: 'archived',
-} as const
-
-const CategoryStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
-} as const
-
-export type ProductStatus = (typeof ProductStatus)[keyof typeof ProductStatus]
-export type CategoryStatus = (typeof CategoryStatus)[keyof typeof CategoryStatus]
-
-export { ProductStatus, CategoryStatus }
+// Re-export from shared constants
+export {
+  ProductStatus,
+  CategoryStatus,
+  ProductStatusOptions,
+  CategoryStatusOptions,
+  DEFAULT_PAGE,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+  ProductSortOptions,
+  ProductSortOrder,
+  type ProductStatus as ProductStatusType,
+  type CategoryStatus as CategoryStatusType,
+  type ProductSortBy,
+  type ProductSortOrder as ProductSortOrderType,
+} from '../../../shared/src/constants/product.constants';

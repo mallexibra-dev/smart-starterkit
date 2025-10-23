@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { productService } from "@/services/product.service";
 import { Product, CreateProductData, UpdateProductData, ProductCategoryOptions, ProductStatusOptions } from "@/types/product";
+import { CreateProductSchema, UpdateProductSchema } from "shared/src/validation/products.validation";
 import { FormInput } from "@/components/blocks/forms/form-input";
 import { FormSelect } from "@/components/blocks/forms/form-select";
 import { FormTextarea } from "@/components/blocks/forms/form-textarea";
@@ -99,34 +100,22 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const schema = mode === "create" ? CreateProductSchema : UpdateProductSchema;
+    const result = schema.safeParse(formData);
 
-    if (!formData.name || formData.name.trim().length < 1) {
-      newErrors.name = "Product name is required";
+    if (!result.success) {
+      const newErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path.length > 0) {
+          newErrors[issue.path[0] as string] = issue.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
     }
 
-    if (!formData.price || formData.price <= 0) {
-      newErrors.price = "Price must be greater than 0";
-    }
-
-    if (!formData.sku || formData.sku.trim().length < 1) {
-      newErrors.sku = "SKU is required";
-    }
-
-    if (formData.stock_quantity !== undefined && formData.stock_quantity < 0) {
-      newErrors.stock_quantity = "Stock quantity cannot be negative";
-    }
-
-    if (formData.min_stock_level !== undefined && formData.min_stock_level < 0) {
-      newErrors.min_stock_level = "Minimum stock level cannot be negative";
-    }
-
-    if (formData.weight !== undefined && formData.weight !== null && formData.weight < 0) {
-      newErrors.weight = "Weight cannot be negative";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

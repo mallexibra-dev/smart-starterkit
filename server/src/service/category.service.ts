@@ -1,5 +1,5 @@
 import { db } from '../../utils/db'
-import { Category, CreateCategoryData, UpdateCategoryData } from 'shared/src/types/category.type'
+import type { Category, CreateCategoryData, UpdateCategoryData } from 'shared/src/types/category.type'
 
 export class CategoryService {
   async getCategories(): Promise<Category[]> {
@@ -48,7 +48,7 @@ export class CategoryService {
         [id]
       )
 
-      return (rows as Category[]).length > 0 ? (rows as Category[])[0] : null
+      return (rows as Category[])[0] ?? null
     } catch (error) {
       console.error('Error getting category by id:', error)
       throw new Error('Failed to retrieve category')
@@ -66,7 +66,7 @@ export class CategoryService {
         [slug]
       )
 
-      return (rows as Category[]).length > 0 ? (rows as Category[])[0] : null
+      return (rows as Category[])[0] ?? null
     } catch (error) {
       console.error('Error getting category by slug:', error)
       throw new Error('Failed to retrieve category')

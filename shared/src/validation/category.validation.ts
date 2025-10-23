@@ -34,8 +34,7 @@ export const categoryBaseSchema = z.object({
     .default(0),
 
   status: z.enum(["active", "inactive"], {
-    required_error: "Status is required",
-    invalid_type_error: "Status must be either active or inactive"
+    message: "Status must be either active or inactive"
   }).default("active")
 });
 
