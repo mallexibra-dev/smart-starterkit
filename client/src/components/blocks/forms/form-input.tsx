@@ -18,6 +18,7 @@ interface FormInputProps {
   error?: string
   className?: string
   showTogglePassword?: boolean
+  required?: boolean
 }
 
 export function FormInput({
@@ -30,7 +31,8 @@ export function FormInput({
   disabled = false,
   error,
   className,
-  showTogglePassword = false
+  showTogglePassword = false,
+  required = false
 }: FormInputProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [internalValue, setInternalValue] = useState(value || "")
@@ -53,6 +55,7 @@ export function FormInput({
       {label && (
         <Label htmlFor={id} className={cn(error && "text-destructive")}>
           {label}
+          {required && <span className="text-destructive ml-1">*</span>}
         </Label>
       )}
       <div className="relative">

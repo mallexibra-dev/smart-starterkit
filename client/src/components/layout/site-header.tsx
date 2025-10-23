@@ -2,15 +2,14 @@
 
 import * as React from "react"
 import {
-  Bell,
   ChevronDown,
   CreditCard,
   Home,
   Menu,
+  Package,
   Plus,
   Search,
   Settings,
-  User,
 } from "lucide-react"
 
 import {
@@ -108,7 +107,7 @@ export function SiteHeader({
                 size="icon"
                 className="relative"
               >
-                <Bell className="h-4 w-4" />
+                <Package className="h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500 text-[10px] text-white flex items-center justify-center">
                   3
                 </span>
@@ -116,35 +115,35 @@ export function SiteHeader({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+              <DropdownMenuLabel>Product Notifications</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <div className="max-h-96 overflow-y-auto">
                 <DropdownMenuItem className="flex flex-col items-start">
                   <div className="flex items-center w-full justify-between">
-                    <span className="font-medium">New user registration</span>
-                    <Badge variant="secondary">New</Badge>
+                    <span className="font-medium">Low stock alert</span>
+                    <Badge variant="destructive">Critical</Badge>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    John Doe just created an account
+                    iPhone 15 Pro is running low on stock (5 units left)
                   </span>
                   <span className="text-xs text-muted-foreground">2 min ago</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex flex-col items-start">
                   <div className="flex items-center w-full justify-between">
-                    <span className="font-medium">Order completed</span>
+                    <span className="font-medium">New product added</span>
                     <Badge variant="secondary">New</Badge>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    Order #12345 has been completed
+                    MacBook Air M3 has been added to inventory
                   </span>
                   <span className="text-xs text-muted-foreground">1 hour ago</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex flex-col items-start">
                   <div className="flex items-center w-full justify-between">
-                    <span className="font-medium">System update</span>
+                    <span className="font-medium">Price updated</span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    System will be updated tonight at 2 AM
+                    iPad Pro prices have been updated across all variants
                   </span>
                   <span className="text-xs text-muted-foreground">3 hours ago</span>
                 </DropdownMenuItem>
@@ -173,8 +172,8 @@ export function SiteHeader({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                New User
+                <Package className="mr-2 h-4 w-4" />
+                New Product
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard className="mr-2 h-4 w-4" />

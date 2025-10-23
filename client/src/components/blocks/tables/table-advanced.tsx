@@ -28,6 +28,7 @@ interface TableAction {
   onClick: (row: any, index: number) => void
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
   disabled?: boolean
+  customComponent?: (row: any) => React.ReactNode
 }
 
 interface TableAdvancedProps {
@@ -233,19 +234,24 @@ export function TableAdvanced({
       {actions.length <= 2 ? (
         // Show buttons directly if 2 or fewer actions
         actions.map((action, actionIndex) => (
-          <Button
-            key={actionIndex}
-            variant={action.variant || "ghost"}
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              action.onClick(row, index)
-            }}
-            disabled={action.disabled}
-          >
-            {action.icon && <span className="mr-1">{action.icon}</span>}
-            {action.label}
-          </Button>
+          <div key={actionIndex}>
+            {action.customComponent ? (
+              action.customComponent(row)
+            ) : (
+              <Button
+                variant={action.variant || "ghost"}
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  action.onClick(row, index)
+                }}
+                disabled={action.disabled}
+              >
+                {action.icon && <span className="mr-1">{action.icon}</span>}
+                {action.label}
+              </Button>
+            )}
+          </div>
         ))
       ) : (
         // Show dropdown if more than 2 actions
@@ -261,17 +267,24 @@ export function TableAdvanced({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {actions.map((action, actionIndex) => (
-              <DropdownMenuItem
-                key={actionIndex}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  action.onClick(row, index)
-                }}
-                disabled={action.disabled}
-              >
-                {action.icon && <span className="mr-2">{action.icon}</span>}
-                {action.label}
-              </DropdownMenuItem>
+              <div key={actionIndex}>
+                {action.customComponent ? (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    {action.customComponent(row)}
+                  </div>
+                ) : (
+                  <DropdownMenuItem
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      action.onClick(row, index)
+                    }}
+                    disabled={action.disabled}
+                  >
+                    {action.icon && <span className="mr-2">{action.icon}</span>}
+                    {action.label}
+                  </DropdownMenuItem>
+                )}
+              </div>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>

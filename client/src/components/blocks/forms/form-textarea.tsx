@@ -12,6 +12,7 @@ interface FormTextareaProps {
   error?: string
   rows?: number
   className?: string
+  required?: boolean
 }
 
 export function FormTextarea({
@@ -23,7 +24,8 @@ export function FormTextarea({
   disabled = false,
   error,
   rows = 3,
-  className
+  className,
+  required = false
 }: FormTextareaProps) {
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange?.(e.target.value)
@@ -34,6 +36,7 @@ export function FormTextarea({
       {label && (
         <Label htmlFor={id} className={cn(error && "text-destructive")}>
           {label}
+          {required && <span className="text-destructive ml-1">*</span>}
         </Label>
       )}
       <Textarea

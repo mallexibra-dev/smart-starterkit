@@ -18,6 +18,7 @@ interface FormSelectProps {
   disabled?: boolean
   error?: string
   className?: string
+  required?: boolean
 }
 
 export function FormSelect({
@@ -29,13 +30,15 @@ export function FormSelect({
   options,
   disabled = false,
   error,
-  className
+  className,
+  required = false
 }: FormSelectProps) {
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
         <Label htmlFor={id} className={cn(error && "text-destructive")}>
           {label}
+          {required && <span className="text-destructive ml-1">*</span>}
         </Label>
       )}
       <Select
