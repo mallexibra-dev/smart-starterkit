@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContainerLayout } from "@/components/layout/ContainerLayout";
+import { ContainerLayout } from "@/components/layout/container-layout";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { categoryService } from "@/services/category.service";
@@ -13,7 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package, Tag, BarChart3, Eye, Edit } from "lucide-react";
-import { useToastHelpers } from "@/components/blocks/custom-toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 import { productService } from "@/services/product.service";
 
 export const Route = createFileRoute("/categories/")({
@@ -108,18 +108,20 @@ function ProductCategories() {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => navigate({
-                to: "/products",
-                search: {
-                  page: 1,
-                  limit: 10,
-                  sort_by: "name",
-                  sort_order: "asc",
-                  search: "",
-                  category_id: undefined,
-                  status: "",
-                }
-              })}
+              onClick={() =>
+                navigate({
+                  to: "/products",
+                  search: {
+                    page: 1,
+                    limit: 10,
+                    sort_by: "name",
+                    sort_order: "asc",
+                    search: "",
+                    category_id: undefined,
+                    status: "",
+                  },
+                })
+              }
             >
               <Package className="h-4 w-4 mr-2" />
               View All Products

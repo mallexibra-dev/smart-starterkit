@@ -21,7 +21,7 @@ import {
   Scale,
   Ruler
 } from "lucide-react";
-import { useToastHelpers } from "@/components/blocks/custom-toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 
 interface ProductDetailProps {
   productId: number;

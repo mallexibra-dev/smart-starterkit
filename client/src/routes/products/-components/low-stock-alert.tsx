@@ -14,7 +14,7 @@ import {
   ArrowRight,
   CheckCircle
 } from "lucide-react";
-import { useToastHelpers } from "@/components/blocks/custom-toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 
 export function LowStockAlert() {
   const navigate = useNavigate();

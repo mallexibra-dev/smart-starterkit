@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContainerLayout } from "@/components/layout/ContainerLayout";
+import { ContainerLayout } from "@/components/layout/container-layout";
 import { ProductDetail } from "./-components/product-detail";
 
 export const Route = createFileRoute("/categories/edit/$id")({

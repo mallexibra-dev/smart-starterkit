@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContainerLayout } from "@/components/layout/ContainerLayout";
+import { ContainerLayout } from "@/components/layout/container-layout";
 
 // Card Components
 import { MetricCard } from "@/components/blocks/cards/metric-card";
@@ -16,7 +16,15 @@ import { ButtonShowcase } from "@/components/blocks/forms/button-showcase";
 // Table Components
 import { TableBasic } from "@/components/blocks/tables/table-basic";
 import { TableWithCheckbox } from "@/components/blocks/tables/table-with-checkbox";
-import { TableAdvanced, renderAvatar, renderStatus, renderDescription, renderContact, renderRating, defaultActions } from "@/components/blocks/tables/table-advanced";
+import {
+  TableAdvanced,
+  renderAvatar,
+  renderStatus,
+  renderDescription,
+  renderContact,
+  renderRating,
+  defaultActions,
+} from "@/components/blocks/tables/table-advanced";
 
 // Form Components
 import { FormInput } from "@/components/blocks/forms/form-input";
@@ -32,7 +40,36 @@ import { FormSearch } from "@/components/blocks/forms/form-search";
 import { FormMultiSelect } from "@/components/blocks/forms/form-multiselect";
 
 // Icons
-import { Users, Activity, DollarSign, BarChart3, CheckCircle, Wifi, Zap, Upload, Download, Eye, Edit, Trash, Heart, Play, Pause, RefreshCw, Bell, Copy, Share2, Bookmark, MessageCircle, AlertCircle, CheckCircle2, XCircle, Info, Lightbulb, Sparkles, Zap as BoltIcon } from "lucide-react";
+import {
+  Users,
+  Activity,
+  DollarSign,
+  BarChart3,
+  CheckCircle,
+  Wifi,
+  Zap,
+  Upload,
+  Download,
+  Eye,
+  Edit,
+  Trash,
+  Heart,
+  Play,
+  Pause,
+  RefreshCw,
+  Bell,
+  Copy,
+  Share2,
+  Bookmark,
+  MessageCircle,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Info,
+  Lightbulb,
+  Sparkles,
+  Zap as BoltIcon,
+} from "lucide-react";
 
 // Hooks
 import { useState } from "react";
@@ -40,7 +77,7 @@ import { useState } from "react";
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useToastHelpers } from "@/components/blocks/custom-toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -54,7 +91,11 @@ function Index() {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState(["react", "typescript", "nodejs"]);
+  const [selectedSkills, setSelectedSkills] = useState([
+    "react",
+    "typescript",
+    "nodejs",
+  ]);
   const [volumeLevel, setVolumeLevel] = useState(75);
   const [qualityLevel, setQualityLevel] = useState(80);
   const [tags, setTags] = useState(["react", "typescript", "design"]);
@@ -62,33 +103,49 @@ function Index() {
 
   const handleLike = () => {
     setIsLiked(!isLiked);
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
     toast.success(isLiked ? "Like removed!" : "Post liked!");
   };
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
-    toast.info(isPlaying ? "Paused" : "Playing", `Media is now ${isPlaying ? "paused" : "playing"}`);
+    toast.info(
+      isPlaying ? "Paused" : "Playing",
+      `Media is now ${isPlaying ? "paused" : "playing"}`,
+    );
   };
 
   const handleClick = () => {
-    setClickCount(prev => prev + 1);
+    setClickCount((prev) => prev + 1);
     if ((clickCount + 1) % 10 === 0) {
-      toast.success(`Milestone! 🎉`, `You've reached ${clickCount + 1} clicks!`);
+      toast.success(
+        `Milestone! 🎉`,
+        `You've reached ${clickCount + 1} clicks!`,
+      );
     }
   };
 
   const handleBookmark = () => {
     setIsBookmarked(!isBookmarked);
-    toast.info(isBookmarked ? "Bookmark removed" : "Bookmarked!", `This item has been ${isBookmarked ? "removed from" : "added to"} your bookmarks.`);
+    toast.info(
+      isBookmarked ? "Bookmark removed" : "Bookmarked!",
+      `This item has been ${isBookmarked ? "removed from" : "added to"} your bookmarks.`,
+    );
   };
 
   const handleRefresh = () => {
     setIsLoading(true);
-    toast.loading("Refreshing...", "Please wait while we refresh the content.", { duration: 0 });
+    toast.loading(
+      "Refreshing...",
+      "Please wait while we refresh the content.",
+      { duration: 0 },
+    );
     setTimeout(() => {
       setIsLoading(false);
-      toast.success("Content refreshed!", "The content has been successfully refreshed.");
+      toast.success(
+        "Content refreshed!",
+        "The content has been successfully refreshed.",
+      );
     }, 2000);
   };
 
@@ -98,16 +155,25 @@ function Index() {
   };
 
   const handleShare = () => {
-    toast.info("Share", "Share dialog opened - you can share this content with others.");
+    toast.info(
+      "Share",
+      "Share dialog opened - you can share this content with others.",
+    );
   };
 
   const handleNotification = () => {
     setNotificationCount(0);
-    toast.success("Notifications Cleared!", `All ${notificationCount} notifications have been cleared.`);
+    toast.success(
+      "Notifications Cleared!",
+      `All ${notificationCount} notifications have been cleared.`,
+    );
   };
 
   const handleComment = () => {
-    toast.info("Comment Box", "Comment box opened - you can now leave your feedback.");
+    toast.info(
+      "Comment Box",
+      "Comment box opened - you can now leave your feedback.",
+    );
   };
 
   const handleSuccess = () => {
@@ -136,11 +202,9 @@ function Index() {
     });
   };
 
-  
   return (
     <ContainerLayout title="Design System Showcase">
-        <div className="space-y-12">
-
+      <div className="space-y-12">
         {/* Cards Section */}
         <section className="space-y-6">
           <h2 className="text-2xl font-bold">Cards & Charts</h2>
@@ -243,22 +307,22 @@ function Index() {
                     title: "System backup completed",
                     description: "Daily backup completed successfully",
                     timestamp: "2 minutes ago",
-                    variant: "success"
+                    variant: "success",
                   },
                   {
                     id: "2",
                     title: "New user registered",
                     description: "john.doe@example.com joined the platform",
                     timestamp: "15 minutes ago",
-                    variant: "info"
+                    variant: "info",
                   },
                   {
                     id: "3",
                     title: "High CPU usage detected",
                     description: "Server CPU usage exceeded 80% threshold",
                     timestamp: "1 hour ago",
-                    variant: "warning"
-                  }
+                    variant: "warning",
+                  },
                 ]}
               />
             </div>
@@ -304,32 +368,32 @@ function Index() {
                   id: "1",
                   type: "success",
                   title: "Success!",
-                  message: "Your data has been saved successfully."
+                  message: "Your data has been saved successfully.",
                 },
                 {
                   id: "2",
                   type: "info",
                   title: "Information:",
-                  message: "New features are available in the dashboard."
+                  message: "New features are available in the dashboard.",
                 },
                 {
                   id: "3",
                   type: "warning",
                   title: "Warning:",
-                  message: "Storage usage is approaching its limit."
+                  message: "Storage usage is approaching its limit.",
                 },
                 {
                   id: "4",
                   type: "error",
                   title: "Error:",
-                  message: "Failed to connect to the server."
+                  message: "Failed to connect to the server.",
                 },
                 {
                   id: "5",
                   type: "loading",
                   title: "Loading:",
-                  message: "Please wait while we process your request."
-                }
+                  message: "Please wait while we process your request.",
+                },
               ]}
             />
           </section>
@@ -342,29 +406,29 @@ function Index() {
           <div className="space-y-8">
             {/* Social Media Buttons */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Social Media Actions</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Social Media Actions
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={handleLike}
                   variant={isLiked ? "default" : "outline"}
-                  className={isLiked ? "bg-red-500 hover:bg-red-600 text-white" : ""}
+                  className={
+                    isLiked ? "bg-red-500 hover:bg-red-600 text-white" : ""
+                  }
                 >
-                  <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-current' : ''}`} />
+                  <Heart
+                    className={`h-4 w-4 mr-2 ${isLiked ? "fill-current" : ""}`}
+                  />
                   {likeCount}
                 </Button>
 
-                <Button
-                  onClick={handleComment}
-                  variant="outline"
-                >
+                <Button onClick={handleComment} variant="outline">
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Comment
                 </Button>
 
-                <Button
-                  onClick={handleShare}
-                  variant="default"
-                >
+                <Button onClick={handleShare} variant="default">
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>
@@ -372,10 +436,16 @@ function Index() {
                 <Button
                   onClick={handleBookmark}
                   variant={isBookmarked ? "default" : "outline"}
-                  className={isBookmarked ? "bg-yellow-500 hover:bg-yellow-600 text-white" : ""}
+                  className={
+                    isBookmarked
+                      ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                      : ""
+                  }
                 >
-                  <Bookmark className={`h-4 w-4 mr-2 ${isBookmarked ? 'fill-current' : ''}`} />
-                  {isBookmarked ? 'Saved' : 'Save'}
+                  <Bookmark
+                    className={`h-4 w-4 mr-2 ${isBookmarked ? "fill-current" : ""}`}
+                  />
+                  {isBookmarked ? "Saved" : "Save"}
                 </Button>
               </div>
             </div>
@@ -389,8 +459,12 @@ function Index() {
                   size="lg"
                   className="bg-green-500 hover:bg-green-600 text-white"
                 >
-                  {isPlaying ? <Pause className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-                  {isPlaying ? 'Pause' : 'Play'}
+                  {isPlaying ? (
+                    <Pause className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Play className="h-4 w-4 mr-2" />
+                  )}
+                  {isPlaying ? "Pause" : "Play"}
                 </Button>
 
                 <Button
@@ -398,15 +472,19 @@ function Index() {
                   disabled={isLoading}
                   variant="outline"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  {isLoading ? 'Refreshing...' : 'Refresh'}
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+                  />
+                  {isLoading ? "Refreshing..." : "Refresh"}
                 </Button>
               </div>
             </div>
 
             {/* Notification Actions */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Notification Actions</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Notification Actions
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={handleNotification}
@@ -428,18 +506,12 @@ function Index() {
             <div>
               <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
               <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={handleCopy}
-                  variant="outline"
-                >
+                <Button onClick={handleCopy} variant="outline">
                   <Copy className="h-4 w-4 mr-2" />
                   Copy Link
                 </Button>
 
-                <Button
-                  onClick={handleClick}
-                  variant="default"
-                >
+                <Button onClick={handleClick} variant="default">
                   <BoltIcon className="h-4 w-4 mr-2" />
                   Click Me ({clickCount})
                 </Button>
@@ -448,7 +520,9 @@ function Index() {
 
             {/* Toast Notification Buttons */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Basic Toast Notifications</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Basic Toast Notifications
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={handleSuccess}
@@ -458,10 +532,7 @@ function Index() {
                   Success
                 </Button>
 
-                <Button
-                  onClick={handleError}
-                  variant="destructive"
-                >
+                <Button onClick={handleError} variant="destructive">
                   <XCircle className="h-4 w-4 mr-2" />
                   Error
                 </Button>
@@ -494,13 +565,19 @@ function Index() {
 
             {/* Custom Toast Examples */}
             <div>
-              <h3 className="text-xl font-semibold mb-4">Custom Toast Examples</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Custom Toast Examples
+              </h3>
               <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={() => {
-                    toast.success("Payment Successful!", "Your order #12345 has been confirmed and will be shipped soon.", {
-                      duration: 5000,
-                    });
+                    toast.success(
+                      "Payment Successful!",
+                      "Your order #12345 has been confirmed and will be shipped soon.",
+                      {
+                        duration: 5000,
+                      },
+                    );
                   }}
                   variant="outline"
                 >
@@ -510,12 +587,16 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.error("Upload Failed", "The file exceeds the maximum size limit of 10MB.", {
-                      action: {
-                        label: "Retry",
-                        onClick: () => console.log("Retry upload"),
+                    toast.error(
+                      "Upload Failed",
+                      "The file exceeds the maximum size limit of 10MB.",
+                      {
+                        action: {
+                          label: "Retry",
+                          onClick: () => console.log("Retry upload"),
+                        },
                       },
-                    });
+                    );
                   }}
                   variant="outline"
                 >
@@ -525,9 +606,13 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.warning("Storage Warning", "You've used 85% of your storage space. Consider upgrading your plan.", {
-                      duration: 8000,
-                    });
+                    toast.warning(
+                      "Storage Warning",
+                      "You've used 85% of your storage space. Consider upgrading your plan.",
+                      {
+                        duration: 8000,
+                      },
+                    );
                   }}
                   variant="outline"
                 >
@@ -537,9 +622,13 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("New Feature Available!", "Check out our new dashboard analytics feature in the settings.", {
-                      icon: <Lightbulb className="h-4 w-4" />,
-                    });
+                    toast.info(
+                      "New Feature Available!",
+                      "Check out our new dashboard analytics feature in the settings.",
+                      {
+                        icon: <Lightbulb className="h-4 w-4" />,
+                      },
+                    );
                   }}
                   variant="outline"
                 >
@@ -549,9 +638,13 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.loading("Processing...", "Please wait while we process your request.", {
-                      duration: 0,
-                    });
+                    toast.loading(
+                      "Processing...",
+                      "Please wait while we process your request.",
+                      {
+                        duration: 0,
+                      },
+                    );
                   }}
                   variant="outline"
                 >
@@ -561,13 +654,18 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.custom("Custom Toast!", "This is a completely custom toast with purple background.", {
-                      icon: <Sparkles className="h-4 w-4" />,
-                      style: {
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        border: "none",
+                    toast.custom(
+                      "Custom Toast!",
+                      "This is a completely custom toast with purple background.",
+                      {
+                        icon: <Sparkles className="h-4 w-4" />,
+                        style: {
+                          background:
+                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          border: "none",
+                        },
                       },
-                    });
+                    );
                   }}
                   variant="outline"
                 >
@@ -583,10 +681,14 @@ function Index() {
               <div className="flex flex-wrap gap-2">
                 <Button
                   onClick={() => {
-                    toast.info("Top Left Position", "This toast appears in the top-left corner", {
-                      position: "top-left",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Top Left Position",
+                      "This toast appears in the top-left corner",
+                      {
+                        position: "top-left",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -596,10 +698,14 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("Top Right Position", "This toast appears in the top-right corner", {
-                      position: "top-right",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Top Right Position",
+                      "This toast appears in the top-right corner",
+                      {
+                        position: "top-right",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -609,10 +715,14 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("Top Center Position", "This toast appears in the top-center", {
-                      position: "top-center",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Top Center Position",
+                      "This toast appears in the top-center",
+                      {
+                        position: "top-center",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -622,10 +732,14 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("Bottom Left Position", "This toast appears in the bottom-left corner", {
-                      position: "bottom-left",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Bottom Left Position",
+                      "This toast appears in the bottom-left corner",
+                      {
+                        position: "bottom-left",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -635,10 +749,14 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("Bottom Right Position", "This toast appears in the bottom-right corner", {
-                      position: "bottom-right",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Bottom Right Position",
+                      "This toast appears in the bottom-right corner",
+                      {
+                        position: "bottom-right",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -648,10 +766,14 @@ function Index() {
 
                 <Button
                   onClick={() => {
-                    toast.info("Bottom Center Position", "This toast appears in the bottom-center", {
-                      position: "bottom-center",
-                      showIcon: true,
-                    });
+                    toast.info(
+                      "Bottom Center Position",
+                      "This toast appears in the bottom-center",
+                      {
+                        position: "bottom-center",
+                        showIcon: true,
+                      },
+                    );
                   }}
                   variant="outline"
                   size="sm"
@@ -678,109 +800,160 @@ function Index() {
               <h3 className="text-xl font-semibold mb-4">Basic Table</h3>
               <TableBasic
                 data={[
-                  { id: "1", name: "John Doe", email: "john@example.com", role: "Admin" },
-                  { id: "2", name: "Jane Smith", email: "jane@example.com", role: "User" },
-                  { id: "3", name: "Bob Johnson", email: "bob@example.com", role: "Moderator" }
+                  {
+                    id: "1",
+                    name: "John Doe",
+                    email: "john@example.com",
+                    role: "Admin",
+                  },
+                  {
+                    id: "2",
+                    name: "Jane Smith",
+                    email: "jane@example.com",
+                    role: "User",
+                  },
+                  {
+                    id: "3",
+                    name: "Bob Johnson",
+                    email: "bob@example.com",
+                    role: "Moderator",
+                  },
                 ]}
                 columns={[
                   { key: "id", header: "ID" },
                   { key: "name", header: "Name" },
                   { key: "email", header: "Email" },
-                  { key: "role", header: "Role" }
+                  { key: "role", header: "Role" },
                 ]}
               />
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">Table with Checkbox</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Table with Checkbox
+              </h3>
               <TableWithCheckbox
                 data={[
-                  { id: "1", name: "John Doe", email: "john@example.com", status: "Active" },
-                  { id: "2", name: "Jane Smith", email: "jane@example.com", status: "Active" },
-                  { id: "3", name: "Bob Johnson", email: "bob@example.com", status: "Inactive" }
+                  {
+                    id: "1",
+                    name: "John Doe",
+                    email: "john@example.com",
+                    status: "Active",
+                  },
+                  {
+                    id: "2",
+                    name: "Jane Smith",
+                    email: "jane@example.com",
+                    status: "Active",
+                  },
+                  {
+                    id: "3",
+                    name: "Bob Johnson",
+                    email: "bob@example.com",
+                    status: "Inactive",
+                  },
                 ]}
                 columns={[
                   { key: "name", header: "Name" },
                   { key: "email", header: "Email" },
-                  { key: "status", header: "Status" }
+                  { key: "status", header: "Status" },
                 ]}
               />
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">Advanced Table with Custom Rendering (Reusable)</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Advanced Table with Custom Rendering (Reusable)
+              </h3>
               <TableAdvanced
                 data={[
                   {
                     id: "1",
                     name: "Sarah Johnson",
                     email: "sarah@example.com",
-                    avatar: "https://images.unsplash.com/photo-1494790108755-2616b912b886?w=32&h=32&fit=crop&crop=face",
+                    avatar:
+                      "https://images.unsplash.com/photo-1494790108755-2616b912b886?w=32&h=32&fit=crop&crop=face",
                     title: "Senior Developer",
-                    description: "Full-stack developer with 5+ years of experience in React and Node.js. Passionate about building scalable applications.",
+                    description:
+                      "Full-stack developer with 5+ years of experience in React and Node.js. Passionate about building scalable applications.",
                     status: "active",
                     tags: ["React", "TypeScript", "Node.js"],
                     rating: 5,
                     phone: "+1 (555) 123-4567",
-                    location: "San Francisco, CA"
+                    location: "San Francisco, CA",
                   },
                   {
                     id: "2",
                     name: "Michael Chen",
                     email: "michael@example.com",
-                    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
+                    avatar:
+                      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face",
                     title: "Product Designer",
-                    description: "UX/UI designer focused on creating intuitive and beautiful user interfaces. Specialized in mobile design.",
+                    description:
+                      "UX/UI designer focused on creating intuitive and beautiful user interfaces. Specialized in mobile design.",
                     status: "premium",
                     tags: ["Figma", "UI Design", "Mobile"],
                     rating: 4,
                     phone: "+1 (555) 987-6543",
-                    location: "New York, NY"
+                    location: "New York, NY",
                   },
                   {
                     id: "3",
                     name: "Emily Rodriguez",
                     email: "emily@example.com",
-                    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face",
+                    avatar:
+                      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face",
                     title: "Marketing Manager",
-                    description: "Digital marketing specialist with expertise in SEO, content marketing, and social media strategy.",
+                    description:
+                      "Digital marketing specialist with expertise in SEO, content marketing, and social media strategy.",
                     status: "active",
                     tags: ["Marketing", "SEO", "Content"],
                     rating: 4,
-                    location: "Austin, TX"
-                  }
+                    location: "Austin, TX",
+                  },
                 ]}
                 columns={[
                   { key: "name", header: "User" },
                   { key: "description", header: "Information" },
                   { key: "status", header: "Status" },
                   { key: "rating", header: "Rating" },
-                  { key: "contact", header: "Contact" }
+                  { key: "contact", header: "Contact" },
                 ]}
                 renderers={{
                   avatar: renderAvatar,
                   description: renderDescription,
                   status: renderStatus,
                   rating: renderRating,
-                  contact: renderContact
+                  contact: renderContact,
                 }}
                 actions={[
-                  { ...defaultActions.view, onClick: (row) => console.log("View user:", row) },
-                  { ...defaultActions.edit, onClick: (row) => console.log("Edit user:", row) },
-                  { ...defaultActions.delete, onClick: (row) => console.log("Delete user:", row) }
+                  {
+                    ...defaultActions.view,
+                    onClick: (row) => console.log("View user:", row),
+                  },
+                  {
+                    ...defaultActions.edit,
+                    onClick: (row) => console.log("Edit user:", row),
+                  },
+                  {
+                    ...defaultActions.delete,
+                    onClick: (row) => console.log("Delete user:", row),
+                  },
                 ]}
                 bulkActions={[
                   {
                     label: "Export Selected",
                     icon: <Download className="h-4 w-4" />,
-                    onClick: (selected) => console.log("Export selected:", selected),
-                    variant: "outline"
+                    onClick: (selected) =>
+                      console.log("Export selected:", selected),
+                    variant: "outline",
                   },
                   {
                     label: "Delete Selected",
-                    onClick: (selected) => console.log("Delete selected:", selected),
-                    variant: "destructive"
-                  }
+                    onClick: (selected) =>
+                      console.log("Delete selected:", selected),
+                    variant: "destructive",
+                  },
                 ]}
                 showBulkActions
                 selectionEnabled
@@ -788,57 +961,118 @@ function Index() {
             </div>
 
             <div>
-              <h3 className="text-xl font-semibold mb-4">Custom Table with Local Renderers + Pagination</h3>
+              <h3 className="text-xl font-semibold mb-4">
+                Custom Table with Local Renderers + Pagination
+              </h3>
               <TableAdvanced
                 data={[
-                  { id: "1", product: "Laptop Pro", price: 1299, stock: 15, category: "Electronics" },
-                  { id: "2", product: "Wireless Mouse", price: 29, stock: 45, category: "Accessories" },
-                  { id: "3", product: "USB-C Hub", price: 59, stock: 8, category: "Accessories" },
-                  { id: "4", product: "Mechanical Keyboard", price: 149, stock: 12, category: "Accessories" },
-                  { id: "5", product: "Monitor 4K", price: 399, stock: 5, category: "Electronics" },
-                  { id: "6", product: "Webcam HD", price: 79, stock: 23, category: "Electronics" },
-                  { id: "7", product: "Docking Station", price: 199, stock: 3, category: "Accessories" }
+                  {
+                    id: "1",
+                    product: "Laptop Pro",
+                    price: 1299,
+                    stock: 15,
+                    category: "Electronics",
+                  },
+                  {
+                    id: "2",
+                    product: "Wireless Mouse",
+                    price: 29,
+                    stock: 45,
+                    category: "Accessories",
+                  },
+                  {
+                    id: "3",
+                    product: "USB-C Hub",
+                    price: 59,
+                    stock: 8,
+                    category: "Accessories",
+                  },
+                  {
+                    id: "4",
+                    product: "Mechanical Keyboard",
+                    price: 149,
+                    stock: 12,
+                    category: "Accessories",
+                  },
+                  {
+                    id: "5",
+                    product: "Monitor 4K",
+                    price: 399,
+                    stock: 5,
+                    category: "Electronics",
+                  },
+                  {
+                    id: "6",
+                    product: "Webcam HD",
+                    price: 79,
+                    stock: 23,
+                    category: "Electronics",
+                  },
+                  {
+                    id: "7",
+                    product: "Docking Station",
+                    price: 199,
+                    stock: 3,
+                    category: "Accessories",
+                  },
                 ]}
                 columns={[
                   { key: "product", header: "Product Name" },
                   { key: "price", header: "Price" },
                   { key: "stock", header: "Stock Status" },
-                  { key: "category", header: "Category" }
+                  { key: "category", header: "Category" },
                 ]}
                 renderers={{
-                  price: (value) => <span className="font-bold text-green-600">${value}</span>,
+                  price: (value) => (
+                    <span className="font-bold text-green-600">${value}</span>
+                  ),
                   stock: (value) => (
-                    <span className={value > 20 ? "text-green-600" : value > 10 ? "text-yellow-600" : "text-red-600"}>
-                      {value > 20 ? "In Stock" : value > 10 ? "Low Stock" : "Critical"}
-                      <span className="ml-2 text-muted-foreground">({value} units)</span>
+                    <span
+                      className={
+                        value > 20
+                          ? "text-green-600"
+                          : value > 10
+                            ? "text-yellow-600"
+                            : "text-red-600"
+                      }
+                    >
+                      {value > 20
+                        ? "In Stock"
+                        : value > 10
+                          ? "Low Stock"
+                          : "Critical"}
+                      <span className="ml-2 text-muted-foreground">
+                        ({value} units)
+                      </span>
                     </span>
                   ),
                   category: (value) => (
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                       {value}
                     </span>
-                  )
+                  ),
                 }}
                 actions={[
                   {
                     label: "Edit",
                     icon: <Edit className="h-4 w-4" />,
                     onClick: (row) => console.log("Edit product:", row),
-                    variant: "outline"
+                    variant: "outline",
                   },
                   {
                     label: "Delete",
                     icon: <Trash className="h-4 w-4" />,
                     onClick: (row) => console.log("Delete product:", row),
-                    variant: "destructive"
-                  }
+                    variant: "destructive",
+                  },
                 ]}
                 bulkActions={[
                   {
                     label: "Update Stock",
-                    onClick: (selected) => console.log("Update stock for:", selected),
-                    variant: "default"
-                  }
+                    onClick: (selected) =>
+                      console.log("Update stock for:", selected),
+                    variant: "default",
+                  },
                 ]}
                 showBulkActions
                 selectionEnabled
@@ -907,7 +1141,7 @@ function Index() {
                 options={[
                   { value: "admin", label: "Admin" },
                   { value: "user", label: "User" },
-                  { value: "moderator", label: "Moderator" }
+                  { value: "moderator", label: "Moderator" },
                 ]}
               />
 
@@ -924,16 +1158,52 @@ function Index() {
                 placeholder="Select skills..."
                 searchPlaceholder="Search skills..."
                 options={[
-                  { value: "react", label: "React", description: "JavaScript library for building UIs" },
-                  { value: "typescript", label: "TypeScript", description: "Typed JavaScript" },
-                  { value: "nodejs", label: "Node.js", description: "JavaScript runtime" },
-                  { value: "python", label: "Python", description: "Programming language" },
-                  { value: "docker", label: "Docker", description: "Container platform" },
+                  {
+                    value: "react",
+                    label: "React",
+                    description: "JavaScript library for building UIs",
+                  },
+                  {
+                    value: "typescript",
+                    label: "TypeScript",
+                    description: "Typed JavaScript",
+                  },
+                  {
+                    value: "nodejs",
+                    label: "Node.js",
+                    description: "JavaScript runtime",
+                  },
+                  {
+                    value: "python",
+                    label: "Python",
+                    description: "Programming language",
+                  },
+                  {
+                    value: "docker",
+                    label: "Docker",
+                    description: "Container platform",
+                  },
                   { value: "aws", label: "AWS", description: "Cloud services" },
-                  { value: "mongodb", label: "MongoDB", description: "NoSQL database" },
-                  { value: "postgresql", label: "PostgreSQL", description: "SQL database" },
-                  { value: "graphql", label: "GraphQL", description: "API query language" },
-                  { value: "kubernetes", label: "Kubernetes", description: "Container orchestration" }
+                  {
+                    value: "mongodb",
+                    label: "MongoDB",
+                    description: "NoSQL database",
+                  },
+                  {
+                    value: "postgresql",
+                    label: "PostgreSQL",
+                    description: "SQL database",
+                  },
+                  {
+                    value: "graphql",
+                    label: "GraphQL",
+                    description: "API query language",
+                  },
+                  {
+                    value: "kubernetes",
+                    label: "Kubernetes",
+                    description: "Container orchestration",
+                  },
                 ]}
                 value={selectedSkills}
                 onChange={(values) => {
@@ -950,10 +1220,7 @@ function Index() {
             <div className="space-y-6">
               <h3 className="text-xl font-semibold">Controls</h3>
 
-              <FormCheckbox
-                id="terms"
-                label="Accept terms and conditions"
-              />
+              <FormCheckbox id="terms" label="Accept terms and conditions" />
 
               <FormCheckbox
                 id="newsletter"
@@ -1036,8 +1303,8 @@ function Index() {
             />
           </div>
         </section>
-        </div>
-      </ContainerLayout>
+      </div>
+    </ContainerLayout>
   );
 }
 

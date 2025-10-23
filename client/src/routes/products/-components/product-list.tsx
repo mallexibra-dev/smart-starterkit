@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Plus, Search, Filter, Package, AlertTriangle, Eye, Edit, Trash } from "lucide-react";
-import { useToastHelpers } from "@/components/blocks/custom-toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 
 export function ProductList() {
   const navigate = useNavigate();

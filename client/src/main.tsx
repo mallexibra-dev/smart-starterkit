@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
-import { ToastProvider } from "@/components/blocks/custom-toast";
+import { ToastProvider } from "@/components/blocks/toast";
 import { Toaster } from "@/components/ui/sonner";
 import "./index.css";
 

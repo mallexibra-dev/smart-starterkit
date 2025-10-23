@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContainerLayout } from "@/components/layout/ContainerLayout";
+import { ContainerLayout } from "@/components/layout/container-layout";
 import { ProductForm } from "./-components/product-form";
 
 export const Route = createFileRoute("/products/create")({

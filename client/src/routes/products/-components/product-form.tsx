@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { toast, useToastHelpers } from "@/components/blocks/custom-toast";
+import { toast, useToastHelpers } from "@/components/blocks/toast";
 import { ArrowLeft, Save, X } from "lucide-react";
 
 interface ProductFormProps {
