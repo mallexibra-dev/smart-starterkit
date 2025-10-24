@@ -1,4 +1,4 @@
-import {
+import type {
   Category,
   CreateCategoryData,
   UpdateCategoryData,
@@ -11,7 +11,7 @@ export interface ApiResponse {
   data: any
 }
 
-export {
+export type {
   Category,
   CreateCategoryData,
   UpdateCategoryData,

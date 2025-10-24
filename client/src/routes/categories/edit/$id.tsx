@@ -1,17 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ContainerLayout } from "@/components/layout/container-layout";
-import { ProductDetail } from "./-components/product-detail";
+import { CategoryDetail } from "../-components/category-detail";
 
 export const Route = createFileRoute("/categories/edit/$id")({
-  component: ProductDetailPage,
+  component: CategoryEditPage,
 });
 
-function ProductDetailPage() {
+function CategoryEditPage() {
   const { id } = Route.useParams();
 
   return (
-    <ContainerLayout title="Product Detail">
-      <ProductDetail productId={parseInt(id)} />
+    <ContainerLayout title="Edit Category">
+      <CategoryDetail categoryId={parseInt(id)} />
     </ContainerLayout>
   );
 }

@@ -1,5 +1,5 @@
 // Import types and constants from shared workspace
-import {
+import type {
   Product,
   CreateProductData,
   UpdateProductData,
@@ -10,19 +10,25 @@ import {
 
 import {
   ProductStatusOptions,
-  DefaultCategoryOptions,
   type ProductStatus
 } from 'shared/src/constants/product.constants';
 
+import {
+  DefaultCategoryOptions
+} from 'shared/src/constants/category.constants';
+
 // Export all types for backward compatibility
-export {
+export type {
   Product,
   CreateProductData,
   UpdateProductData,
   ProductQuery,
   ProductListResponse,
   Category,
-  ProductStatus,
+  ProductStatus
+};
+
+export {
   ProductStatusOptions
 };
 

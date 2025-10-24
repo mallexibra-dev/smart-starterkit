@@ -6,7 +6,6 @@ import { productService } from "@/services/product.service";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Package,
-  BarChart3,
   Eye,
   RefreshCw,
   Edit,
@@ -22,6 +20,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { useToastHelpers } from "@/components/blocks/toast";
+import type { Product } from "@/types/product";
 
 export const Route = createFileRoute("/products/low-stock")({
   component: ProductLowStock,
@@ -31,7 +30,7 @@ function ProductLowStock() {
   const navigate = useNavigate();
   const toast = useToastHelpers();
   const [loading, setLoading] = useState(false);
-  const [lowStockProducts, setLowStockProducts] = useState([]);
+  const [lowStockProducts, setLowStockProducts] = useState<Product[]>([]);
 
   const loadLowStockProducts = async () => {
     try {
@@ -108,7 +107,18 @@ function ProductLowStock() {
                 Refresh
               </Button>
               <Button
-                onClick={() => navigate({ to: "/products/" })}
+                onClick={() => navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  })}
                 className="gap-2"
               >
                 <Package className="h-4 w-4" />
@@ -227,7 +237,7 @@ function ProductLowStock() {
                           <StatusIcon className="h-4 w-4" />
                         </div>
                         <Badge variant="secondary" className="text-xs">
-                          {product.category_name || "Unknown"}
+                          {product.category?.name || "Unknown"}
                         </Badge>
                       </div>
                       <Badge
@@ -337,10 +347,7 @@ function ProductLowStock() {
                           onClick={() =>
                             navigate({
                               to: `/products/edit/${product.id}`,
-                              state: {
-                                from: "/categories",
-                                category: product.category_slug,
-                              },
+                              search: {}
                             })
                           }
                           className="gap-1"
@@ -373,7 +380,18 @@ function ProductLowStock() {
               </p>
               <div className="flex gap-3">
                 <Button
-                  onClick={() => navigate({ to: "/products/" })}
+                  onClick={() => navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  })}
                   className="gap-2"
                 >
                   <Package className="h-4 w-4" />

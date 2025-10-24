@@ -187,6 +187,11 @@ export const ProductStatsResponse = BaseOk.extend({
   data: ProductStats,
 }).openapi('ProductStatsResponse')
 
+// Low Stock Products Response
+export const LowStockProductsResponse = BaseOk.extend({
+  data: z.array(Product),
+}).openapi('LowStockProductsResponse')
+
 // Activate/Deactivate response schemas
 export const ProductActivated = BaseOk.extend({
   data: Product

@@ -11,11 +11,13 @@ import {
   ProductQuery,
   CategoryParams,
   ProductStatsResponse,
+  LowStockProductsResponse,
   CreateProduct,
   UpdateProduct,
   RestockProduct
 } from '../schemas/product.schema'
 import { BaseError } from '../schemas/base.schema'
+import { CategoryStatsOk } from '../schemas/category.schema'
 
 const router = new OpenAPIHono()
 const controller = new ProductController()
@@ -53,7 +55,7 @@ router.openapi(
     responses: {
       200: {
         description: 'Low stock products retrieved successfully',
-        content: { 'application/json': { schema: ProductListResponse } }
+        content: { 'application/json': { schema: LowStockProductsResponse } }
       },
       500: {
         description: 'Server Error',
@@ -97,7 +99,7 @@ router.openapi(
     responses: {
       200: {
         description: 'Category stats retrieved successfully',
-        content: { 'application/json': { schema: ProductStatsResponse } }
+        content: { 'application/json': { schema: CategoryStatsOk } }
       },
       500: {
         description: 'Server Error',
@@ -118,7 +120,7 @@ router.openapi(
     path: '/category/{category}',
     request: {
       params: CategoryParams,
-      query: ProductQuery.omit({ category: true }),
+      query: ProductQuery,
     },
     responses: {
       200: {

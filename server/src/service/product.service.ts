@@ -5,7 +5,8 @@ import type {
   CreateProductData,
   UpdateProductData,
   ProductQuery,
-  ProductListResponse
+  ProductListResponse,
+  CategoryStats
 } from '../../../shared/src/types/products.type'
 
 export class ProductService {
@@ -82,7 +83,7 @@ export class ProductService {
       }
 
       const [countRows] = await db.execute(countSql, countParams)
-      const total = (countRows as any[])[0].total
+      const total = Number((countRows as any[])[0].total)
 
       // Parse JSON fields for each product
       const products = (rows as any[]).map(row => ({
@@ -98,13 +99,13 @@ export class ProductService {
         } : null,
       })) as Product[]
 
-      const totalPages = Math.ceil(total / query.limit)
+      const totalPages = Math.ceil(total / Number(query.limit || 10))
 
       return {
         data: products,
         pagination: {
-          page: query.page,
-          limit: query.limit,
+          page: Number(query.page || 1),
+          limit: Number(query.limit || 10),
           total,
           total_pages: totalPages
         }
@@ -354,28 +355,33 @@ export class ProductService {
     }
   }
 
-  async getCategoryStats() {
+  async getCategoryStats(): Promise<CategoryStats[]> {
     try {
       const [rows] = await db.execute(`
         SELECT
-          c.name as category,
-          COUNT(*) as count,
+          c.id,
+          c.name,
+          c.slug,
+          c.color,
+          COUNT(*) as product_count,
           SUM(CASE WHEN p.stock_quantity <= p.min_stock_level AND p.stock_quantity > 0 THEN 1 ELSE 0 END) as low_stock_count,
-          SUM(p.price * p.stock_quantity) as total_value,
-          AVG(p.price) as avg_price
-        FROM products p
-        LEFT JOIN categories c ON p.category_id = c.id
-        WHERE p.deleted_at IS NULL
-        GROUP BY c.name
-        ORDER BY count DESC
+          SUM(CASE WHEN p.stock_quantity = 0 THEN 1 ELSE 0 END) as out_of_stock_count,
+          COALESCE(SUM(p.price * p.stock_quantity), 0) as total_value
+        FROM categories c
+        LEFT JOIN products p ON c.id = p.category_id AND p.deleted_at IS NULL
+        GROUP BY c.id, c.name, c.slug, c.color
+        ORDER BY c.sort_order ASC, c.name ASC
       `)
 
       return (rows as any[]).map(row => ({
-        category: row.category || 'Uncategorized',
-        count: row.count,
-        lowStockCount: row.low_stock_count,
-        totalValue: row.total_value || 0,
-        avgPrice: row.avg_price || 0
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        color: row.color,
+        product_count: row.product_count,
+        low_stock_count: row.low_stock_count,
+        out_of_stock_count: row.out_of_stock_count,
+        total_value: row.total_value
       }))
     } catch (error) {
       console.error('Error getting category stats:', error)

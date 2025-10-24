@@ -9,9 +9,7 @@ import { FormTextarea } from "@/components/blocks/forms/form-textarea";
 import { FormTags } from "@/components/blocks/forms/form-tags";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { toast, useToastHelpers } from "@/components/blocks/toast";
+import { useToastHelpers } from "@/components/blocks/toast";
 import { ArrowLeft, Save, X } from "lucide-react";
 
 interface ProductFormProps {
@@ -131,11 +129,33 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
       if (mode === "create") {
         await productService.createProduct(formData as CreateProductData);
         toastHelpers.success("Success", "Product created successfully");
-        navigate({ to: "/products/" });
+        navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  });
       } else if (productId) {
         await productService.updateProduct(productId, formData as UpdateProductData);
         toastHelpers.success("Success", "Product updated successfully");
-        navigate({ to: "/products/" });
+        navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  });
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "Failed to save product";
@@ -147,7 +167,18 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
   };
 
   const handleCancel = () => {
-    navigate({ to: "/products/" });
+    navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  });
   };
 
   return (
@@ -218,9 +249,8 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
               id="price"
               label="Price"
               type="number"
-              step="0.01"
               placeholder="0.00"
-              value={formData.price || 0}
+              value={String(formData.price || 0)}
               onChange={(value) => handleInputChange("price", parseFloat(value) || 0)}
               error={errors.price}
               required
@@ -260,7 +290,7 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
               label="Stock Quantity"
               type="number"
               placeholder="0"
-              value={formData.stock_quantity || 0}
+              value={String(formData.stock_quantity || 0)}
               onChange={(value) => handleInputChange("stock_quantity", parseInt(value) || 0)}
               error={errors.stock_quantity}
             />
@@ -270,7 +300,7 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
               label="Minimum Stock Level"
               type="number"
               placeholder="0"
-              value={formData.min_stock_level || 0}
+              value={String(formData.min_stock_level || 0)}
               onChange={(value) => handleInputChange("min_stock_level", parseInt(value) || 0)}
               error={errors.min_stock_level}
             />
@@ -290,9 +320,8 @@ export function ProductForm({ mode, productId, initialData }: ProductFormProps) 
               id="weight"
               label="Weight (kg)"
               type="number"
-              step="0.01"
               placeholder="0.00"
-              value={formData.weight || 0}
+              value={String(formData.weight || 0)}
               onChange={(value) => handleInputChange("weight", parseFloat(value) || 0)}
               error={errors.weight}
             />

@@ -5,7 +5,6 @@ import { Product, ProductCategoryOptions, ProductStatusOptions } from "@/types/p
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,13 +12,11 @@ import {
   Edit,
   Trash,
   Package,
-  DollarSign,
   Box,
   AlertTriangle,
   Calendar,
   Tag,
-  Scale,
-  Ruler
+  Scale
 } from "lucide-react";
 import { useToastHelpers } from "@/components/blocks/toast";
 
@@ -62,7 +59,18 @@ export function ProductDetail({ productId }: ProductDetailProps) {
       setDeleteLoading(true);
       await productService.deleteProduct(product.id);
       toast.success("Success", "Product deleted successfully");
-      navigate({ to: "/products/" });
+      navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  });
     } catch (error) {
       toast.error("Error", "Failed to delete product");
       console.error("Error deleting product:", error);
@@ -189,7 +197,18 @@ export function ProductDetail({ productId }: ProductDetailProps) {
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900">Product not found</h2>
         <p className="text-gray-600 mt-2">The product you're looking for doesn't exist.</p>
-        <Button onClick={() => navigate({ to: "/products/" })} className="mt-4">
+        <Button onClick={() => navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  })} className="mt-4">
           Back to Products
         </Button>
       </div>
@@ -204,7 +223,18 @@ export function ProductDetail({ productId }: ProductDetailProps) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate({ to: "/products/" })}
+            onClick={() => navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  })}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back

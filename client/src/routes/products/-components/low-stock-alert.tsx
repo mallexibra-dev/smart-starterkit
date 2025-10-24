@@ -9,8 +9,6 @@ import { TableAdvanced } from "@/components/blocks/tables/table-advanced";
 import {
   AlertTriangle,
   RefreshCw,
-  Package,
-  Box,
   ArrowRight,
   CheckCircle
 } from "lucide-react";
@@ -191,7 +189,18 @@ export function LowStockAlert() {
               <p className="text-gray-600">
                 All products are above their minimum stock levels. No immediate action required.
               </p>
-              <Button onClick={() => navigate({ to: "/products/" })} className="mt-4">
+              <Button onClick={() => navigate({
+    to: "/products",
+    search: {
+      page: 1,
+      limit: 10,
+      sort_by: "created_at",
+      sort_order: "desc",
+      search: "",
+      category_id: undefined,
+      status: ""
+    }
+  })} className="mt-4">
                 View All Products
               </Button>
             </div>
@@ -243,14 +252,14 @@ export function LowStockAlert() {
                 bulkActions={[
                   {
                     label: "Create Purchase Order",
-                    onClick: (selected) => {
+                    onClick: () => {
                       toast.info("Feature Coming Soon", "Purchase order creation will be available soon");
                     },
                     variant: "default",
                   },
                   {
                     label: "Mark as In Stock",
-                    onClick: (selected) => {
+                    onClick: () => {
                       toast.info("Feature Coming Soon", "Stock updates will be available soon");
                     },
                     variant: "outline",
