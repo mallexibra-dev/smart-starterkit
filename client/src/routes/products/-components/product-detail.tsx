@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { productService } from "@/services/product.service";
-import { Product, ProductCategoryOptions, ProductStatusOptions } from "@/types/product";
+import { Product } from "shared/src/types/products.type";
+import { ProductCategoryOptions } from "shared/src/constants/category.constants";
+import { ProductStatusOptions } from "shared/src/constants/product.constants";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

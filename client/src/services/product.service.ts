@@ -5,7 +5,7 @@ import type {
   UpdateProductData,
   ProductQuery,
   ProductListResponse
-} from '@/types/product';
+} from 'shared/src/types/products.type';
 
 export class ProductService {
   private readonly baseUrl = '/products';

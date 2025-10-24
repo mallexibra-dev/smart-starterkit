@@ -1,36 +1,5 @@
-// Import types and constants from shared workspace
-import type {
-  Product,
-  CreateProductData,
-  UpdateProductData,
-  ProductQuery,
-  ProductListResponse,
-  Category
-} from 'shared/src/types/products.type';
-
-import {
-  ProductStatusOptions,
-  type ProductStatus
-} from 'shared/src/constants/product.constants';
-
-import {
-  DefaultCategoryOptions
-} from 'shared/src/constants/category.constants';
-
-// Export all types for backward compatibility
-export type {
-  Product,
-  CreateProductData,
-  UpdateProductData,
-  ProductQuery,
-  ProductListResponse,
-  Category,
-  ProductStatus
-};
-
-export {
-  ProductStatusOptions
-};
+// Client-specific types only
+// All shared types should be imported directly from shared package
 
 // Category options interface - should be populated from API call
 export interface CategoryOption {
@@ -42,4 +11,4 @@ export interface CategoryOption {
 }
 
 // For backward compatibility - this should be populated from API
-export const ProductCategoryOptions: CategoryOption[] = DefaultCategoryOptions;
+export const ProductCategoryOptions: CategoryOption[] = [];

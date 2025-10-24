@@ -1,5 +1,6 @@
 import { db } from '../../utils/db'
 import type { Category, CreateCategoryData, UpdateCategoryData } from 'shared/src/types/category.type'
+import { CategoryStatus } from '../../../shared/src/constants/product.constants'
 
 export class CategoryService {
   async getCategories(): Promise<Category[]> {
@@ -9,8 +10,9 @@ export class CategoryService {
           id, name, slug, description, icon, color, sort_order, status,
           created_at, updated_at
         FROM categories
-        WHERE status = 'active'
-        ORDER BY sort_order ASC, name ASC`
+        WHERE status = ?
+        ORDER BY sort_order ASC, name ASC`,
+        [CategoryStatus.ACTIVE]
       )
 
       return rows as Category[]
@@ -212,10 +214,10 @@ export class CategoryService {
           COALESCE(SUM(p.price * p.stock_quantity), 0) as total_value
         FROM categories c
         LEFT JOIN products p ON c.id = p.category_id AND p.deleted_at IS NULL
-        WHERE c.status = 'active'
+        WHERE c.status = ?
         GROUP BY c.id, c.name, c.slug, c.color
         ORDER BY c.sort_order ASC, c.name ASC
-      `)
+      `, [CategoryStatus.ACTIVE])
 
       // Convert string values to numbers for proper JSON serialization
       return (rows as any[]).map(row => ({

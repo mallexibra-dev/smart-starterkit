@@ -3,6 +3,7 @@ import { z } from '@hono/zod-openapi'
 import { Category } from './category.schema'
 import { BaseOk, BaseError } from './base.schema'
 import type { Product as ProductType, CreateProductData, UpdateProductData } from '../../../shared/src/types/products.type'
+import { ProductStatus } from '../../../shared/src/constants/product.constants'
 
 // Category response schemas (needed for category routes)
 export const CategoriesOk = BaseOk.extend({
@@ -21,7 +22,7 @@ export const Product = z.object({
   price: z.number().openapi({ example: 1299.99 }),
   category_id: z.number().openapi({ example: 1 }),
   category: Category.optional().openapi({ example: null }),
-  status: z.enum(['active', 'inactive', 'draft', 'archived']).openapi({ example: 'active' }),
+  status: z.nativeEnum(ProductStatus).openapi({ example: ProductStatus.ACTIVE }),
   sku: z.string().openapi({ example: 'LAP-PRO-15-001' }),
   stock_quantity: z.number().openapi({ example: 50 }),
   min_stock_level: z.number().openapi({ example: 10 }),
@@ -43,7 +44,7 @@ export const CreateProduct = z.object({
     return num;
   }).pipe(z.number().positive()).openapi({ example: 1299.99 }),
   category_id: z.number().positive().openapi({ example: 1 }),
-  status: z.enum(['active', 'inactive', 'draft', 'archived']).default('draft').openapi({ example: 'draft' }),
+  status: z.nativeEnum(ProductStatus).default(ProductStatus.DRAFT).openapi({ example: ProductStatus.DRAFT }),
   sku: z.string().min(1).openapi({ example: 'LAP-PRO-15-001' }),
   stock_quantity: z.union([z.string(), z.number()]).transform((val) => {
     if (typeof val === 'number') return val;
@@ -80,7 +81,7 @@ export const UpdateProduct = z.object({
     return num;
   }).pipe(z.number().positive()).optional().openapi({ example: 1299.99 }),
   category_id: z.number().positive().optional().openapi({ example: 1 }),
-  status: z.enum(['active', 'inactive', 'draft', 'archived']).optional().openapi({ example: 'active' }),
+  status: z.nativeEnum(ProductStatus).optional().openapi({ example: ProductStatus.ACTIVE }),
   sku: z.string().min(1).optional().openapi({ example: 'LAP-PRO-15-001' }),
   stock_quantity: z.union([z.string(), z.number()]).transform((val) => {
     if (typeof val === 'number') return val;

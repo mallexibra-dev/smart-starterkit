@@ -26,3 +26,6 @@ export const DefaultCategoryOptions = [
   { value: 9, label: "Automotive", slug: "automotive", color: "gray", icon: "car" },
   { value: 10, label: "Other", slug: "other", color: "gray", icon: "package" },
 ];
+
+// Export ProductCategoryOptions for backward compatibility
+export const ProductCategoryOptions = DefaultCategoryOptions;

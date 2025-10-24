@@ -20,7 +20,7 @@ import {
   TrendingDown,
 } from "lucide-react";
 import { useToastHelpers } from "@/components/blocks/toast";
-import type { Product } from "@/types/product";
+import type { Product } from "shared/src/types/products.type";
 
 export const Route = createFileRoute("/products/low-stock")({
   component: ProductLowStock,

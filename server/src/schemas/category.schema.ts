@@ -1,6 +1,7 @@
 import { z } from '@hono/zod-openapi'
 import { BaseOk } from './base.schema'
 import type { Category as CategoryType } from '../../../shared/src/types/products.type'
+import { CategoryStatus } from '../../../shared/src/constants/product.constants'
 
 // Category schema that matches shared types with OpenAPI documentation
 export const Category = z.object({
@@ -11,7 +12,7 @@ export const Category = z.object({
   icon: z.string().nullable().openapi({ example: 'laptop' }),
   color: z.string().nullable().openapi({ example: 'blue' }),
   sort_order: z.number().openapi({ example: 1 }),
-  status: z.enum(['active', 'inactive']).openapi({ example: 'active' }),
+  status: z.nativeEnum(CategoryStatus).openapi({ example: CategoryStatus.ACTIVE }),
   created_at: z.string().openapi({ example: '2024-01-01T00:00:00.000Z' }),
   updated_at: z.string().nullable().openapi({ example: '2024-01-01T00:00:00.000Z' }),
 }).openapi('Category') as z.ZodType<CategoryType>
@@ -24,7 +25,7 @@ export const CreateCategory = z.object({
   icon: z.string().optional().openapi({ example: 'laptop' }),
   color: z.string().optional().openapi({ example: 'blue' }),
   sort_order: z.number().optional().openapi({ example: 1 }),
-  status: z.enum(['active', 'inactive']).default('active').openapi({ example: 'active' }),
+  status: z.nativeEnum(CategoryStatus).default(CategoryStatus.ACTIVE).openapi({ example: CategoryStatus.ACTIVE }),
 }).openapi('CreateCategory')
 
 // Schema for updating category

@@ -3,9 +3,8 @@ import {
   Category,
   CreateCategoryData,
   UpdateCategoryData,
-  CategoryListResponse,
   ApiResponse
-} from '@/types/category'
+} from 'shared/src/types/category.type'
 
 class CategoryService {
 

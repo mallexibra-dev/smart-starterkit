@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { productService } from "@/services/product.service";
-import { Product, CreateProductData, UpdateProductData, ProductCategoryOptions, ProductStatusOptions } from "@/types/product";
+import { Product, CreateProductData, UpdateProductData } from "shared/src/types/products.type";
+import { ProductCategoryOptions } from "shared/src/constants/category.constants";
+import { ProductStatusOptions } from "shared/src/constants/product.constants";
 import { CreateProductSchema, UpdateProductSchema } from "shared/src/validation/products.validation";
 import { FormInput } from "@/components/blocks/forms/form-input";
 import { FormSelect } from "@/components/blocks/forms/form-select";

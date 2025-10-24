@@ -8,6 +8,7 @@ import type {
   ProductListResponse,
   CategoryStats
 } from '../../../shared/src/types/products.type'
+import { ProductStatus } from '../../../shared/src/constants/product.constants'
 
 export class ProductService {
   async getProducts(query: ProductQuery): Promise<ProductListResponse> {
@@ -294,8 +295,9 @@ export class ProductService {
         FROM products
         WHERE deleted_at IS NULL
         AND stock_quantity <= min_stock_level
-        AND status = 'active'
-        ORDER BY stock_quantity ASC`
+        AND status = ?
+        ORDER BY stock_quantity ASC`,
+        [ProductStatus.ACTIVE]
       )
 
       return rows as Product[]
@@ -393,9 +395,9 @@ export class ProductService {
     try {
       const [result] = await db.execute(
         `UPDATE products
-         SET status = 'active', updated_at = NOW()
+         SET status = ?, updated_at = NOW()
          WHERE id = ? AND deleted_at IS NULL`,
-        [id]
+        [ProductStatus.ACTIVE, id]
       )
 
       if ((result as any).affectedRows === 0) {
@@ -436,9 +438,9 @@ export class ProductService {
     try {
       const [result] = await db.execute(
         `UPDATE products
-         SET status = 'inactive', updated_at = NOW()
+         SET status = ?, updated_at = NOW()
          WHERE id = ? AND deleted_at IS NULL`,
-        [id]
+        [ProductStatus.INACTIVE, id]
       )
 
       if ((result as any).affectedRows === 0) {
