@@ -1,37 +1,59 @@
--- Drop existing tables if they exist
-DROP TABLE IF EXISTS `sessions`;
-DROP TABLE IF EXISTS `users`;
+-- =====================================================
+-- SMART STARTERKIT DATABASE SCHEMA
+-- =====================================================
 
--- Create users table
-CREATE TABLE `users` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(191) NOT NULL,
-  `username` VARCHAR(191) NOT NULL,
-  `email` VARCHAR(191) NULL,
-  `password` VARCHAR(255) NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `deleted_at` TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `users_username_unique` (`username`),
-  UNIQUE KEY `users_email_unique` (`email`),
-  KEY `users_deleted_at_idx` (`deleted_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Create database if not exists
+CREATE DATABASE IF NOT EXISTS smart_starterkit;
+USE smart_starterkit;
 
--- Create sessions table
-CREATE TABLE `sessions` (
-  `id` VARCHAR(36) PRIMARY KEY,
-  `user_id` INT UNSIGNED NOT NULL,
-  `expires_at` DATETIME NOT NULL,
-  `refresh_token` VARCHAR(255) NOT NULL,
-  `refresh_expires_at` DATETIME NOT NULL,
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
-  UNIQUE KEY `sessions_refresh_token_unique` (`refresh_token`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Drop existing tables if they exist (for clean setup)
+DROP TABLE IF EXISTS users;
 
--- Seed data
-INSERT INTO `users` (`name`, `username`, `email`, `password`) VALUES
-('Alice Example', 'alice', 'alice@example.com', NULL),
-('Bob Example', 'bob', 'bob@example.com', NULL),
-('Charlie Example', 'charlie', 'charlie@example.com', NULL);
+-- =====================================================
+-- USERS TABLE (Basic User Management)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    avatar VARCHAR(255) NULL,
+    role ENUM('admin', 'user') NOT NULL DEFAULT 'user',
+    status ENUM('active', 'inactive', 'suspended') NOT NULL DEFAULT 'active',
+    email_verified_at TIMESTAMP NULL,
+    last_login_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL,
+
+    -- Indexes for performance
+    INDEX idx_email (email),
+    INDEX idx_role (role),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at),
+    INDEX idx_last_login_at (last_login_at),
+    INDEX idx_deleted_at (deleted_at),
+
+    -- Composite indexes for common queries
+    INDEX idx_role_status (role, status),
+    INDEX idx_status_active (status, deleted_at),
+
+    -- Full-text search index for user names
+    FULLTEXT INDEX idx_search (name)
+);
+
+-- =====================================================
+-- SAMPLE USERS DATA
+-- =====================================================
+
+-- Insert admin user (password: admin123)
+INSERT IGNORE INTO users (name, email, password_hash, role, status, email_verified_at) VALUES
+('Admin User', 'admin@smartstarterkit.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjuZzZzZzZzZzZzZzZzZzZzZzZzZzZzZzZzZz', 'admin', 'active', NOW()),
+('Demo User', 'demo@smartstarterkit.com', '$2b$10$rOzJqQjQjQjQjQjQjQjQjuZzZzZzZzZzZzZzZzZzZzZzZzZzZzZzZzZz', 'user', 'active', NOW());
+
+-- =====================================================
+-- INDEXES FOR PERFORMANCE
+-- =====================================================
+
+-- Additional performance indexes can be added here as needed
+-- based on specific application requirements

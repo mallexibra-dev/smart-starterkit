@@ -25,10 +25,6 @@ smart-starterkit/
 ├── 📁 client/                     # Frontend React App
 │   ├── 📁 src/
 │   │   ├── 📁 components/
-│   │   │   └── 📁 blocks/        # component globals can use all routes
-│   │   │       └── 📄 custom-toast.tsx
-│   │   │   └── 📁 layout/        # component for layouts
-│   │   │       └── 📄 container.tsx
 │   │   │   └── 📁 ui/            # shadcn/ui components
 │   │   │       └── 📄 button.tsx
 │   │   ├── 📁 routes/            # TanStack Router
@@ -207,11 +203,13 @@ bun run build            # Build TypeScript
 **Client (.env.local)**
 ```env
 API_URL=http://localhost:3000
+CLERK_PUBLISHABLE_KEY=your_clerk_key
 ```
 
 **Server (.env.local)**
 ```env
 PORT=3000
+CLERK_SECRET_KEY=your_clerk_secret
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root

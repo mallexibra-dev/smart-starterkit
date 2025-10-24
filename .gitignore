@@ -1,6 +1,4 @@
-# ai training
-.claude
-.cursor
+# bhvr/.gitignore
 
 # logs
 server/logs
@@ -46,3 +44,7 @@ pnpm-debug.log*
 # Bun
 bun.lockb
 .turbo
+
+# Keep empty directories
+!.gitkeep
+!*/.gitkeep
