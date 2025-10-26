@@ -8,6 +8,20 @@ import {
   Settings,
   ChevronRight
 } from "lucide-react"
+import { type LucideIcon } from "lucide-react"
+
+// Type definitions
+interface NavItem {
+  title: string
+  url: string
+  icon?: LucideIcon
+  items?: NavItem[]
+}
+
+interface NavData {
+  navMain: NavItem[]
+  navSecondary: NavItem[]
+}
 
 import {
   Collapsible,
@@ -31,7 +45,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 
-const data = {
+const data: NavData = {
   navMain: [
     {
       title: "Dashboard",
@@ -122,7 +136,7 @@ export function AppSidebar({
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
                 <Link to={item.url}>
-                  <item.icon />
+                  {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

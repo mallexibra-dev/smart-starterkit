@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useAsyncError } from '@/components/AsyncErrorBoundary';
+import { useAsyncError } from '@/components/layout/async-error-boundary';
 
 interface UseAsyncOperationOptions<T> {
   onSuccess?: (data: T) => void;

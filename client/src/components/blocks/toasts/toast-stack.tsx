@@ -57,9 +57,7 @@ function ToastItem({ toast, onClose, style }: ToastItemProps) {
     <div
       className={cn(
         "min-w-[320px] max-w-md p-4 rounded-lg shadow-xl border backdrop-blur-sm",
-        config.bgColor,
-        config.textColor,
-        config.borderColor,
+        config.className,
         "animate-in slide-in-from-right-2 fade-in-0 duration-300",
         "hover:shadow-2xl transition-all duration-200",
         toast.className

@@ -365,7 +365,7 @@ export function TableAdvanced({
                     {column.render
                       ? column.render(row[column.key], row, index)
                       : renderers[column.key]
-                        ? renderers[column.key](row[column.key], row)
+                        ? renderers[column.key]!(row[column.key], row)
                         : row[column.key]
                     }
                   </TableCell>

@@ -4,9 +4,67 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Smart Starterkit is a clean, modern monorepo template built with Bun, featuring a React frontend with TanStack Router and a Hono backend with PostgreSQL database and Drizzle ORM. The project uses TypeScript throughout and follows a modular architecture with shared types and utilities. This is a **starterkit template** - clean and ready for you to build your features on top.
+Smart Starterkit is a clean, modern production-ready monorepo template built with Bun, featuring a React frontend with TanStack Router and a Hono backend with PostgreSQL database and Drizzle ORM. The project uses TypeScript throughout and follows a modular architecture with shared types and utilities. This is a **starterkit template** - clean and ready for you to build your features on top.
 
-## Common Development Commands
+## 🚀 Project Status: 100% Production-Ready
+
+This starterkit has been thoroughly tested and is **100% production-ready** with comprehensive features for modern fullstack development.
+
+## 📋 Quick Start
+
+### Prerequisites
+- Bun runtime (recommended) or Node.js 18+
+- PostgreSQL 16+
+- Docker & Docker Compose
+
+### 1. Environment Setup
+```bash
+# Copy environment template
+cp server/.env.example server/.env.local
+cp client/.env.example client/.env.local
+
+# Configure DATABASE_URL in server/.env.local
+DATABASE_URL=postgresql://app_user:app_password@localhost:5432/smart_starterkit
+```
+
+### 2. Database Setup
+```bash
+# Start PostgreSQL
+docker run -d --name smart-starterkit-postgres \
+  -e POSTGRES_DB=smart_starterkit \
+  -e POSTGRES_USER=app_user \
+  -e POSTGRES_PASSWORD=app_password \
+  -p 5432:5432 \
+  postgres:16
+
+# Run database migrations
+cd server
+bun run db:migrate
+
+# Seed database (optional)
+bun run db:seed
+```
+
+### 3. Development
+```bash
+# Start all services
+bun run dev
+
+# Start individual services
+bun run dev:client    # Frontend at http://localhost:5173
+bun run dev:server    # Backend at http://localhost:3000
+```
+
+### 4. Build & Test
+```bash
+# Build all packages
+bun run build
+
+# Test all packages
+bun run test
+```
+
+## 🔧 Development Commands
 
 ### Root Level Commands
 ```bash
@@ -44,6 +102,10 @@ bun run lint          # ESLint
 cd server
 bun run dev           # Bun watch mode with hot reload
 bun run build         # TypeScript compilation
+
+# Database operations
+bun run db:migrate    # Run database migrations
+bun run db:seed       # Run database seeders
 ```
 
 ## Architecture Overview
@@ -70,7 +132,7 @@ bun run build         # TypeScript compilation
   - `src/components/blocks/` - Reusable feature components (combinations of shadcn-ui)
   - `src/components/layout/` - Layout components
   - `src/routes/{page}/-components/` - Page-specific components only
-- Services in `src/services/` handle API communication with axios
+- Services in `src/services/` handle API communication with TanStack Query (created only when needed)
 - Types are imported from shared workspace: `"shared": "workspace:*"`
 - Validation uses Zod schemas from `shared/src/validation`
 
@@ -78,41 +140,52 @@ bun run build         # TypeScript compilation
 - **Framework**: Hono with OpenAPI integration and Swagger documentation
 - **Database**: PostgreSQL with Drizzle ORM, connection pooling, and Winston logging
 - **Validation**: Zod schemas for request/response validation
-- **Structure**: MVC pattern with routes, controllers, services, and schemas
+- **Structure**: Minimal architecture - routes, controllers, database schema, and utilities
 
 #### Backend File Organization
 ```
 server/src/
-├── route/          # API route definitions with Swagger docs (e.g., user.route.ts)
-├── controller/     # Request handlers receiving params and using services
-├── service/        # Business logic (e.g., user.service.ts)
-├── schemas/        # Zod validation schemas for Swagger documentation
-├── middlewares/    # Custom middleware
-└── utils/          # Utility functions and helpers
+├── routes/         # API route definitions (e.g., user.routes.ts)
+├── controllers/    # Request handlers (e.g., user.controller.ts)
+├── db/            # Database schema, migrations, and seeders
+├── middlewares/   # Custom middleware
+└── utils/         # Utility functions and helpers
 ```
 
 ### Database Setup
-- Database schema with basic user management in `server/database/query.sql`
-- Connection configuration in `server/utils/db.ts`
-- Supports soft deletes with `deleted_at` columns
-- Raw SQL queries (no ORM) with Winston logging
+- PostgreSQL database with Drizzle ORM
+- Schema definitions in `server/src/db/schema.ts`
+- Migrations in `server/src/db/migrations/`
+- Seeders in `server/src/db/seeders/`
+- Connection configuration in `server/src/db/index.ts`
+- Winston logging for database operations
 
 ## Development Workflow
 
 ### Adding New Features
-1. **Check existing structure**: Review database schema in `server/database/query.sql`, existing types in `shared/src/types`, and validation in `shared/src/validation`
-2. **Backend API**: Create route → controller → service → schema files
+1. **Check existing structure**: Review database schema in `server/src/db/schema.ts`, existing types in `shared/src/types`, and validation in `shared/src/validation`
+2. **Backend API**: Create route → controller files (minimal architecture)
 3. **Frontend**: Add route component in `client/src/routes/`
 4. **Shared Types**: Add shared types in `shared/src/types/` and validation in `shared/src/validation/`
 5. **Services**: Create service functions in `client/src/services/` using axios
 6. **Navigation**: Update AppSidebar.tsx if creating new routes
 
 ### File Naming Conventions
-- Types: `{name}.type.ts`
-- Validation: `{name}.validation.ts`
-- Service: `{name}.service.ts`
-- Schema: `{name}.schema.ts`
-- Controller: `{name}.controller.ts`
+
+#### Component Files (Frontend)
+- **File names**: kebab-case (e.g., `loading-spinner.tsx`, `user-card.tsx`)
+- **Component exports**: PascalCase (e.g., `export function LoadingSpinner()`)
+- **Component folders**: `src/components/ui/` for base components, `src/components/blocks/` for reusable components
+
+#### Backend Files
+- **Routes**: `{resource}.routes.ts` (e.g., `user.routes.ts`)
+- **Controllers**: `{resource}.controller.ts` (e.g., `user.controller.ts`)
+- **Types**: `{name}.type.ts`
+- **Validation**: `{name}.validation.ts`
+
+#### Shared Files
+- **Types**: `{name}.type.ts` in `shared/src/types/`
+- **Validation**: `{name}.validation.ts` in `shared/src/validation/`
 
 ### Route Pattern Examples
 - **Frontend**: File-based routing with nested routes
@@ -144,6 +217,80 @@ server/src/
 - **Client**: `.env.local` with `VITE_` prefixed variables
 - **Server**: `.env.local` with database and API configuration
 - **Proxy**: Vite proxies `/api/*` requests to backend server
+
+## Project Structure & File Organization Rules
+
+### 📁 Directory Organization
+
+#### Client Structure (`client/src/`)
+```
+src/
+├── components/
+│   ├── ui/              # Base shadcn/ui components
+│   ├── blocks/          # Reusable feature components (combinations of shadcn-ui)
+│   └── layout/          # Layout components and error handling
+├── contexts/            # React contexts
+├── hooks/              # Custom React hooks
+├── lib/                # Utility libraries
+├── routes/             # TanStack Router pages
+│   └── {page}/
+│       └── -components/ # Page-specific components only
+├── services/           # API services with TanStack Query hooks (only when needed)
+└── main.tsx
+```
+
+#### Server Structure (`server/src/`)
+```
+src/
+├── controllers/        # Request handlers
+├── routes/            # API route definitions
+├── db/                # Database schema, migrations, seeders
+├── middlewares/       # Custom middleware
+├── utils/             # Utility functions
+└── app.ts             # App entry point
+```
+
+#### Shared Structure (`shared/src/`)
+```
+src/
+├── types/             # Shared TypeScript types
+├── validation/        # Zod validation schemas
+└── index.ts          # Shared exports
+```
+
+### 🎯 File Placement Rules
+
+#### ✅ Correct Placement
+- **Component files**: Only in `client/src/components/`
+- **Services**: Only in `client/src/services/`
+- **Types**: Only in `shared/src/types/`
+- **Validation**: Only in `shared/src/validation/`
+- **Database files**: Only in `server/src/db/`
+- **Middleware**: Only in `server/src/middlewares/`
+- **Utils**: In respective `src/utils/` directories
+
+#### ❌ Incorrect Placement (Common Mistakes)
+- **NO** components in `client/src/components/` root folder - must be in `ui/`, `blocks/`, or `layout/`
+- **NO** services in `client/src/app/` or any other folder - only in `client/src/services/`
+- **NO** middleware in `client/src/middleware/`
+- **NO** server files in client directories
+- **NO** client files in server directories
+- **NO** shared logic duplicated in multiple places
+- **NO** service files in `client/src/services/` unless actually used by features
+
+### 📝 Code Organization Standards
+
+#### Import Order
+1. React/Next.js imports
+2. Third-party libraries
+3. Workspace imports (shared)
+4. Local imports (relative paths)
+
+#### Export Standards
+- Use named exports for components and utilities
+- Use default exports only for main app files
+- Keep all types in `shared/src/types/`
+- Keep all validation in `shared/src/validation/`
 
 ## Important Technical Details
 
@@ -210,3 +357,118 @@ This project includes specialized Claude agents for specific tasks:
 4. **Proxy Configuration**: Frontend API calls work through Vite proxy in development
 5. **Build Order**: Turbo handles build dependencies - shared package builds automatically first
 6. **Validation Source**: Always use Zod validation from `shared/src/validation` as single source of truth for both client and server
+7. **Component Naming**: Use kebab-case file names with PascalCase component exports (e.g., `user-card.tsx` exports `UserCard`)
+8. **Component Organization**: Components must be in correct subfolder: `ui/` for base components, `blocks/` for feature components, `layout/` for layout/error components
+9. **File Organization**: Never place files in wrong directories - refer to the File Placement Rules section above
+10. **Minimal Architecture**: Backend uses route → controller pattern only - no service layer to keep it minimal for developers
+11. **Services Directory**: Only create service files when features actually need API calls - keep directory clean with only `.gitkeep` until needed
+
+## 🤖 Claude Code Rules & Guidelines
+
+**📍 IMPORTANT**: Claude must read comprehensive rules from `.claude/` directory before starting any task!
+
+### 📂 **Required Reading Before Any Task**
+Claude **MUST** read the relevant rule files from `.claude/rules/`:
+
+1. **`.claude/README.md`** - Complete overview and quick reference
+2. **`.claude/rules/frontend.md`** - For frontend development tasks
+3. **`.claude/rules/backend.md`** - For backend development tasks
+4. **`.claude/rules/shared.md`** - For shared package development
+5. **`.claude/rules/general.md`** - General development guidelines
+
+### 🚀 **Claude's Workflow for Every Task**
+
+#### Step 1: **Read Rules First**
+```bash
+# Before starting ANY task, Claude must:
+1. Read .claude/README.md for overview
+2. Read relevant domain-specific rules
+3. Check existing patterns in codebase
+4. Follow naming conventions strictly
+```
+
+#### Step 2: **Apply Checklists**
+- **Use quality checklists** from each rule file
+- **Verify file organization** before creating files
+- **Follow naming conventions** consistently
+- **Check against patterns** in existing code
+
+#### Step 3: **Quality Verification**
+- **Complete domain-specific checklists**
+- **Ensure no rule violations**
+- **Verify TypeScript strict compliance**
+- **Check proper error handling**
+
+### 🛑 **Critical Rules (NEVER Break)**
+From `.claude/README.md`:
+
+1. **Component Organization**: Must be in correct subfolder (`ui/`, `blocks/`, or `layout/`)
+2. **Minimal Backend**: NO service layer, route → controller only
+3. **Services Directory**: Only create when API calls needed
+4. **Shared Types**: Single source of truth for data structures
+5. **TypeScript Strict Mode**: 100% compliance, no exceptions
+6. **File Naming**: Kebab-case files, PascalCase exports
+7. **Import Order**: React → third-party → shared → local
+
+### 📋 **Domain-Specific Guidelines**
+
+#### 🖥️ **Frontend Development**
+See: `.claude/rules/frontend.md`
+- Component organization (ui/blocks/layout)
+- shadcn/ui usage patterns
+- TanStack Query implementation
+- TypeScript & accessibility standards
+- Services minimalism (only when needed)
+
+#### 🔧 **Backend Development**
+See: `.claude/rules/backend.md`
+- Minimal architecture (route → controller only)
+- Hono framework patterns
+- Drizzle ORM best practices
+- API security & validation
+- Database operation patterns
+
+#### 🔗 **Shared Package Development**
+See: `.claude/rules/shared.md`
+- Type definition patterns
+- Zod validation schemas
+- Platform-agnostic design
+- Cross-package consistency
+- Export management
+
+#### 📖 **General Development**
+See: `.claude/rules/general.md`
+- Project philosophy & principles
+- Git workflow & commit standards
+- Code quality principles
+- Security guidelines
+- Testing philosophy
+
+### 🔍 **Quality Assurance Process**
+
+#### Before Task Completion:
+- [ ] Read all relevant rule files from `.claude/rules/`
+- [ ] Follow domain-specific checklists
+- [ ] Verify file organization compliance
+- [ ] Check naming convention adherence
+- [ ] Ensure TypeScript strict mode
+- [ ] Validate error handling implementation
+- [ ] Confirm no rule violations
+
+#### Common Violations to Check:
+- **Components in wrong folders**
+- **Service files without API usage**
+- **Incorrect naming conventions**
+- **Missing TypeScript types**
+- **Improper file organization**
+- **Duplicate logic across packages**
+
+### 📞 **Getting Help**
+- **Review rule files** for relevant domain
+- **Check existing patterns** in codebase
+- **Ask for clarification** on ambiguous rules
+- **Suggest improvements** to guidelines
+
+---
+
+**⚠️ CLAUDE MANDATORY: Always read `.claude/` rules before starting any task! This ensures consistent, high-quality development across the Smart Starterkit project.** 🚀

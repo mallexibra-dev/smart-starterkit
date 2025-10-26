@@ -31,9 +31,7 @@ export function CustomToast({
     <div
       className={cn(
         "min-w-[300px] max-w-md p-4 rounded-lg shadow-lg border",
-        config.bgColor,
-        config.textColor,
-        config.borderColor,
+        config.className,
         isVisible ? "animate-in slide-in-from-top-2 fade-in-0 duration-300" : "animate-out slide-out-to-top-2 fade-out-0 duration-300",
         className
       )}

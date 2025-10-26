@@ -13,7 +13,8 @@
     "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seeders/index.ts"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.2",
