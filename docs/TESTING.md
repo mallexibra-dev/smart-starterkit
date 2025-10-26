@@ -222,7 +222,7 @@ describe('Middleware Tests', () => {
 ### Server (API)
 - **Environment**: Node.js
 - **Framework**: Vitest
-- **Mocks**: MySQL, Winston logger, shared utilities
+- **Mocks**: PostgreSQL, Winston logger, shared utilities
 - **Test client**: Simple fetch-based client for HTTP testing
 
 ## 📊 Coverage

@@ -1,25 +1,23 @@
 version: '3.8'
 
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: smart-starterkit-mysql
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16
+    container_name: smart-starterkit-postgres
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: smart_starterkit
-      MYSQL_USER: app_user
-      MYSQL_PASSWORD: app_password
+      POSTGRES_DB: smart_starterkit
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - smart-starterkit-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U app_user -d smart_starterkit"]
       timeout: 20s
       retries: 10
 
@@ -49,17 +47,16 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      DB_HOST: mysql
-      DB_PORT: 3306
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_NAME: smart_starterkit
       DB_USER: app_user
       DB_PASSWORD: app_password
-      JWT_SECRET: your-super-secret-jwt-key-change-in-production
       REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -89,7 +86,7 @@ services:
       - smart-starterkit-network
 
 volumes:
-  mysql_data:
+  postgres_data:
     driver: local
   redis_data:
     driver: local

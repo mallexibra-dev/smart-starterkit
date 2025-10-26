@@ -22,7 +22,7 @@ This project has 3 main directories: client, server, and shared.
 
 **SERVER SIDE:**
 
-- **Server Directory:** Backend API using Hono JS with Swagger documentation, MySQL raw queries (no ORM), and Winston logger
+- **Server Directory:** Backend API using Hono JS with Swagger documentation, PostgreSQL with Drizzle ORM, and Winston logger
 - **Directory Structure:** Must include controller, service, route, schema
 - **Service Directory:** Business logic used by controllers. Check server/database/query.sql for database structure first
 - **Controller Directory:** Receives params and uses services

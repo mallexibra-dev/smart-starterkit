@@ -167,10 +167,10 @@ backup_database() {
 
         mkdir -p "$backup_dir"
 
-        if docker-compose ps mysql | grep -q "Up"; then
-            docker-compose exec -T mysql mysqldump \
+        if docker-compose ps postgres | grep -q "Up"; then
+            docker-compose exec -T postgres postgresdump \
                 -u root \
-                -p"$MYSQL_ROOT_PASSWORD" \
+                -p"$POSTGRES_PASSWORD" \
                 --single-transaction \
                 --routines \
                 --triggers \
@@ -181,7 +181,7 @@ backup_database() {
             # Keep only last 10 backups
             ls -t "$backup_dir"/backup_*.sql | tail -n +11 | xargs -r rm
         else
-            warning "MySQL container is not running, skipping backup"
+            warning "PostgreSQL container is not running, skipping backup"
         fi
     fi
 }
@@ -266,11 +266,11 @@ run_migrations() {
         log "Running database migrations..."
 
         # Check if migrations table exists and run new migrations
-        if docker-compose ps mysql | grep -q "Up"; then
+        if docker-compose ps postgres | grep -q "Up"; then
             # For now, just check if database is accessible
-            docker-compose exec -T mysql mysql \
+            docker-compose exec -T postgres postgres \
                 -u root \
-                -p"$MYSQL_ROOT_PASSWORD" \
+                -p"$POSTGRES_PASSWORD" \
                 -e "SELECT 1" smart_starterkit >/dev/null 2>&1
 
             if [[ $? -eq 0 ]]; then
@@ -280,7 +280,7 @@ run_migrations() {
                 exit 1
             fi
         else
-            error "MySQL container is not running"
+            error "PostgreSQL container is not running"
             exit 1
         fi
     else

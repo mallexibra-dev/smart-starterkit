@@ -1,13 +1,12 @@
 # Smart Starterkit
 
-A modern TypeScript fullstack monorepo starterkit built with Bun, Hono, React, and MySQL.
+A modern TypeScript fullstack monorepo starterkit built with Bun, Hono, React, and PostgreSQL with Drizzle ORM.
 
 ## ✨ Features
 
 - 🚀 **Modern Tech Stack** - Bun, Hono, React 19, Vite, TypeScript
 - 📱 **Monorepo Architecture** - Client, Server, Shared packages
 - 🎨 **Beautiful UI** - shadcn/ui components with Tailwind CSS
-- 🔐 **Authentication** - JWT-based auth with proper validation
 - 🧪 **Testing Ready** - Vitest with React Testing Library
 - 🐳 **Docker Support** - Multi-environment deployment
 - 🛡️ **Error Boundaries** - Production-ready error handling
@@ -41,7 +40,7 @@ smart-starterkit/
 - Node.js 18+
 - Bun (recommended) or npm
 - Docker & Docker Compose
-- MySQL
+- PostgreSQL
 
 ### Installation
 
@@ -120,7 +119,7 @@ Key environment variables:
 
 ### Backend
 - **Hono** - Web framework
-- **MySQL** - Database
+- **PostgreSQL** - Database with Drizzle ORM
 - **Zod** - Schema validation
 - **JWT** - Authentication
 - **Winston** - Logging

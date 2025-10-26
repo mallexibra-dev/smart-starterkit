@@ -1,24 +1,16 @@
 import { vi, afterEach } from 'vitest'
-import mysql from 'mysql2/promise'
+import { drizzle } from 'drizzle-orm/postgres-js'
 
-// Mock MySQL connection
-vi.mock('mysql2/promise', () => ({
-  default: {
-    createConnection: vi.fn(() => Promise.resolve({
-      query: vi.fn(),
-      execute: vi.fn(),
-      beginTransaction: vi.fn(),
-      commit: vi.fn(),
-      rollback: vi.fn(),
-      end: vi.fn(),
-    })),
-    createPool: vi.fn(() => ({
-      getConnection: vi.fn(),
-      query: vi.fn(),
-      execute: vi.fn(),
-      end: vi.fn(),
-    })),
-  },
+// Mock Drizzle connection
+vi.mock('drizzle-orm/postgres-js', () => ({
+  drizzle: vi.fn(() => ({
+    select: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    execute: vi.fn(),
+  })),
+  postgres: vi.fn(() => ({})),
 }))
 
 // Mock Winston logger

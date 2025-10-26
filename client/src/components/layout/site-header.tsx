@@ -5,13 +5,11 @@ import {
   ChevronDown,
   CreditCard,
   Home,
-  LogOut,
   Menu,
   Package,
   Plus,
   Search,
   Settings,
-  User,
 } from "lucide-react"
 
 import {
@@ -28,8 +26,6 @@ import { Badge } from "@/components/ui/badge"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
-import { useAuth } from "@/contexts/auth.context"
-import { useNavigate, Link } from "@tanstack/react-router"
 
 interface SiteHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string
@@ -44,18 +40,6 @@ export function SiteHeader({
   showBreadcrumb = false,
   ...props
 }: SiteHeaderProps) {
-  const { user, logout, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate({ to: '/login' });
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
   return (
     <header
       className={cn(
@@ -201,60 +185,6 @@ export function SiteHeader({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {/* Auth Section */}
-          {isAuthenticated ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:block">
-                    {user?.name || 'User'}
-                  </span>
-                  <ChevronDown className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {user?.name}
-                    </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user?.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link to="/register">Sign Up</Link>
-              </Button>
-            </div>
-          )}
         </div>
       </div>
     </header>

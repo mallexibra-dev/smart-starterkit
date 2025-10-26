@@ -56,24 +56,30 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 
 **Option A: Docker (Recommended)**
 ```bash
-# Start MySQL
-docker run -d --name mysql \
-  -e MYSQL_ROOT_PASSWORD=rootpassword \
-  -e MYSQL_DATABASE=smart_starterkit \
-  -e MYSQL_USER=app_user \
-  -e MYSQL_PASSWORD=app_password \
-  -p 3306:3306 \
-  mysql:8.0
+# Start PostgreSQL
+docker run -d --name postgres \
+  -e POSTGRES_DB=smart_starterkit \
+  -e POSTGRES_USER=app_user \
+  -e POSTGRES_PASSWORD=app_password \
+  -p 5432:5432 \
+  postgres:16
 
-# Import schema
-docker exec -i mysql mysql -u root -prootpassword smart_starterkit < server/database/query.sql
+# Run migrations
+cd server
+bun run db:migrate
 ```
 
-**Option B: Local MySQL**
+**Option B: Local PostgreSQL**
 ```bash
-# Create database and user in your local MySQL
-# Then import the schema
-mysql -u root -p smart_starterkit < server/database/query.sql
+# Create database and user in your local PostgreSQL
+createdb smart_starterkit
+createuser app_user
+psql -c "ALTER USER app_user PASSWORD 'app_password';"
+psql -c "GRANT ALL PRIVILEGES ON DATABASE smart_starterkit TO app_user;"
+
+# Run migrations
+cd server
+bun run db:migrate
 ```
 
 ### 4. Run Development Server
@@ -183,8 +189,10 @@ smart-starterkit/
 
 ### Database
 
-The starterkit uses MySQL with the following schema:
+The starterkit uses PostgreSQL with Drizzle ORM and the following schema:
 - `users` - User management and authentication
+- `categories` - Categories for items
+- `items` - Items with categories and pricing
 - Additional tables can be added as needed
 
 ### Authentication
@@ -263,11 +271,11 @@ kill -9 <PID>
 
 **Database connection:**
 ```bash
-# Check MySQL container
-docker ps | grep mysql
+# Check PostgreSQL container
+docker ps | grep postgres
 
 # Check logs
-docker logs mysql
+docker logs postgres
 ```
 
 **Permission issues:**

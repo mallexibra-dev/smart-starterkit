@@ -111,11 +111,11 @@ curl http://localhost:3000/api/health
 
 **Database connection failed:**
 ```bash
-# Check MySQL container
-docker-compose ps mysql
+# Check PostgreSQL container
+docker-compose ps postgres
 
 # Check logs
-docker-compose logs mysql
+docker-compose logs postgres
 ```
 
 **Port conflicts:**

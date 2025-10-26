@@ -203,40 +203,42 @@ setup_database() {
     # Check if Docker is available
     if command -v docker &> /dev/null; then
         if docker info &> /dev/null; then
-            log "Starting MySQL container for database setup..."
+            log "Starting PostgreSQL container for database setup..."
 
-            # Start MySQL container
+            # Start PostgreSQL container
             docker run -d \
-                --name smart-starterkit-mysql-setup \
-                -e MYSQL_ROOT_PASSWORD=rootpassword \
-                -e MYSQL_DATABASE=smart_starterkit \
-                -e MYSQL_USER=app_user \
-                -e MYSQL_PASSWORD=app_password \
-                -p 3306:3306 \
-                mysql:8.0
+                --name smart-starterkit-postgres-setup \
+                -e POSTGRES_DB=smart_starterkit \
+                -e POSTGRES_USER=app_user \
+                -e POSTGRES_PASSWORD=app_password \
+                -p 5432:5432 \
+                postgres:16
 
-            # Wait for MySQL to be ready
-            log "Waiting for MySQL to be ready..."
+            # Wait for PostgreSQL to be ready
+            log "Waiting for PostgreSQL to be ready..."
             for i in {1..30}; do
-                if docker exec smart-starterkit-mysql-setup mysqladmin ping -h localhost --silent; then
+                if docker exec smart-starterkit-postgres-setup pg_isready -U app_user -d smart_starterkit; then
                     break
                 fi
                 sleep 2
             done
 
-            # Initialize database schema
-            if [[ -f "server/database/query.sql" ]]; then
-                log "Initializing database schema..."
-                docker exec -i smart-starterkit-mysql-setup mysql \
-                    -u root \
-                    -prootpassword \
-                    smart_starterkit < server/database/query.sql
-                success "Database schema initialized"
+            # Run database migrations
+            if [[ -d "server" ]]; then
+                log "Running database migrations..."
+                cd server
+                if command -v bun &> /dev/null; then
+                    bun run db:migrate
+                else
+                    npm run db:migrate
+                fi
+                cd ..
+                success "Database migrations completed"
             fi
 
             # Stop setup container
-            docker stop smart-starterkit-mysql-setup
-            docker rm smart-starterkit-mysql-setup
+            docker stop smart-starterkit-postgres-setup
+            docker rm smart-starterkit-postgres-setup
 
             success "Database setup completed"
         else

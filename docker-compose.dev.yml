@@ -1,25 +1,23 @@
 version: '3.8'
 
 services:
-  # MySQL Database (Development)
-  mysql:
-    image: mysql:8.0
-    container_name: smart-starterkit-mysql-dev
+  # PostgreSQL Database (Development)
+  postgres:
+    image: postgres:16
+    container_name: smart-starterkit-postgres-dev
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: smart_starterkit_dev
-      MYSQL_USER: dev_user
-      MYSQL_PASSWORD: dev_password
+      POSTGRES_DB: smart_starterkit_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
     ports:
-      - "3307:3306"  # Different port to avoid conflicts
+      - "5433:5432"  # Different port to avoid conflicts
     volumes:
-      - mysql_dev_data:/var/lib/mysql
-      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+      - postgres_dev_data:/var/lib/postgresql/data
     networks:
       - smart-starterkit-dev-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U dev_user -d smart_starterkit_dev"]
       timeout: 20s
       retries: 10
 
@@ -45,17 +43,16 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DB_HOST: mysql
-      DB_PORT: 3306
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_NAME: smart_starterkit_dev
       DB_USER: dev_user
       DB_PASSWORD: dev_password
-      JWT_SECRET: dev-jwt-secret-key
       REDIS_URL: redis://redis:6379
     ports:
       - "3001:3000"  # Different port to avoid conflicts
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -94,7 +91,7 @@ services:
     command: ["bun", "run", "dev", "--host", "0.0.0.0"]  # Development command with hot reload
 
 volumes:
-  mysql_dev_data:
+  postgres_dev_data:
     driver: local
   redis_dev_data:
     driver: local

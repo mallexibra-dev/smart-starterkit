@@ -1,25 +1,23 @@
 version: '3.8'
 
 services:
-  # MySQL Database (Staging)
-  mysql:
-    image: mysql:8.0
-    container_name: smart-starterkit-mysql-staging
+  # PostgreSQL Database (Staging)
+  postgres:
+    image: postgres:16
+    container_name: smart-starterkit-postgres-staging
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: staging_root_password
-      MYSQL_DATABASE: smart_starterkit_staging
-      MYSQL_USER: staging_user
-      MYSQL_PASSWORD: staging_password_change_me
+      POSTGRES_DB: smart_starterkit_staging
+      POSTGRES_USER: staging_user
+      POSTGRES_PASSWORD: staging_password_change_me
     ports:
-      - "3308:3306"  # Different port for staging
+      - "5434:5432"  # Different port for staging
     volumes:
-      - mysql_staging_data:/var/lib/mysql
-      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+      - postgres_staging_data:/var/lib/postgresql/data
     networks:
       - smart-starterkit-staging-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U staging_user -d smart_starterkit_staging"]
       timeout: 20s
       retries: 10
 
@@ -43,8 +41,8 @@ services:
     environment:
       NODE_ENV: staging
       PORT: 3000
-      DB_HOST: mysql
-      DB_PORT: 3306
+      DB_HOST: postgres
+      DB_PORT: 5432
       DB_NAME: smart_starterkit_staging
       DB_USER: staging_user
       DB_PASSWORD: staging_password_change_me
@@ -54,7 +52,7 @@ services:
     ports:
       - "3002:3000"  # Different port for staging
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -85,7 +83,7 @@ services:
       - smart-starterkit-staging-network
 
 volumes:
-  mysql_staging_data:
+  postgres_staging_data:
     driver: local
   redis_staging_data:
     driver: local

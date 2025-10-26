@@ -3,9 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
-import { ToastProvider } from "@/components/blocks/toast";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "./contexts/auth.context";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./index.css";
 
@@ -43,12 +41,8 @@ if (!rootElement.innerHTML) {
       >
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
-            <ToastProvider>
-              <AuthProvider>
-                <RouterProvider router={router} />
-                <Toaster />
-              </AuthProvider>
-            </ToastProvider>
+            <RouterProvider router={router} />
+            <Toaster />
           </ThemeProvider>
         </QueryClientProvider>
       </ErrorBoundary>

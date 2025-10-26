@@ -55,7 +55,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "mysql2": "^3.14.5",
+    "pg": "^8.13.1",
     "prettier": "^3.6.2"
   }
 }

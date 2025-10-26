@@ -1,2 +1,2 @@
 // Validation schemas can be added here as needed
-export * from './auth.validation';
+// Currently no validation schemas are required

@@ -19,8 +19,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Handle 401 errors as needed
     if (error.response?.status === 401) {
-      console.warn("Unauthorized, redirect login?");
+      console.warn("Unauthorized request");
     }
     return Promise.reject(error);
   }

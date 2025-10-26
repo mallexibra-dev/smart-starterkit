@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Smart Starterkit is a clean, modern monorepo template built with Bun, featuring a React frontend with TanStack Router and a Hono backend with MySQL database. The project uses TypeScript throughout and follows a modular architecture with shared types and utilities. This is a **starterkit template** - clean and ready for you to build your features on top.
+Smart Starterkit is a clean, modern monorepo template built with Bun, featuring a React frontend with TanStack Router and a Hono backend with PostgreSQL database and Drizzle ORM. The project uses TypeScript throughout and follows a modular architecture with shared types and utilities. This is a **starterkit template** - clean and ready for you to build your features on top.
 
 ## Common Development Commands
 
@@ -50,7 +50,7 @@ bun run build         # TypeScript compilation
 
 ### Monorepo Structure
 - **client/**: React 19 + Vite frontend with TanStack Router
-- **server/**: Hono API backend with MySQL database
+- **server/**: Hono API backend with PostgreSQL database and Drizzle ORM
 - **shared/**: Shared TypeScript types and utilities
 - Uses Bun workspaces for dependency management
 - Turbo for build orchestration and caching
@@ -76,7 +76,7 @@ bun run build         # TypeScript compilation
 
 ### Backend Architecture (server/)
 - **Framework**: Hono with OpenAPI integration and Swagger documentation
-- **Database**: MySQL with raw queries (no ORM), connection pooling, and Winston logging
+- **Database**: PostgreSQL with Drizzle ORM, connection pooling, and Winston logging
 - **Validation**: Zod schemas for request/response validation
 - **Structure**: MVC pattern with routes, controllers, services, and schemas
 
@@ -206,7 +206,7 @@ This project includes specialized Claude agents for specific tasks:
 
 1. **Workspace Dependencies**: Always install dependencies in the correct workspace directory
 2. **Route Generation**: Frontend routes are auto-generated - don't manually edit `routeTree.gen.ts`
-3. **Database Connection**: Ensure MySQL is running and environment variables are configured
+3. **Database Connection**: Ensure PostgreSQL is running and environment variables are configured
 4. **Proxy Configuration**: Frontend API calls work through Vite proxy in development
 5. **Build Order**: Turbo handles build dependencies - shared package builds automatically first
 6. **Validation Source**: Always use Zod validation from `shared/src/validation` as single source of truth for both client and server
