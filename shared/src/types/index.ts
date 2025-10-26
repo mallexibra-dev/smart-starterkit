@@ -7,3 +7,4 @@ export type ApiResponse = {
 
 // Export common types
 export * from './common.type';
+export * from './auth.type';

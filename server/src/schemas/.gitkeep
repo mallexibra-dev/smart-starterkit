@@ -1,0 +1,3 @@
+# This file ensures the schemas directory is tracked by Git
+# even when it's empty. Zod validation schemas for API endpoints will be added here
+# as the application grows. Schemas define request/response validation rules.

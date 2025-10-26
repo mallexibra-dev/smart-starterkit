@@ -1,0 +1,4 @@
+# This file ensures the middlewares directory is tracked by Git
+# even when it's empty. Custom middleware functions will be added here
+# as the application grows. Middlewares handle cross-cutting concerns like
+# authentication, validation, logging, and error handling.

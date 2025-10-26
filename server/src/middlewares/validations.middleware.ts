@@ -19,7 +19,7 @@ export const requireBearer = () => async (c: Context, next: Next) => {
   if (!auth) {
     return c.json(createUnauthorizedResponse(), 401)
   }
-  const parts = auth.split(' ')
+  const parts = auth.trim().split(/\s+/) // Split on any whitespace
   if (parts.length !== 2 || parts[0] !== 'Bearer' || !parts[1]) {
     return c.json(createUnauthorizedResponse(), 401)
   }

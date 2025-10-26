@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # MySQL Database (Staging)
+  mysql:
+    image: mysql:8.0
+    container_name: smart-starterkit-mysql-staging
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: staging_root_password
+      MYSQL_DATABASE: smart_starterkit_staging
+      MYSQL_USER: staging_user
+      MYSQL_PASSWORD: staging_password_change_me
+    ports:
+      - "3308:3306"  # Different port for staging
+    volumes:
+      - mysql_staging_data:/var/lib/mysql
+      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+    networks:
+      - smart-starterkit-staging-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis (Staging)
+  redis:
+    image: redis:7-alpine
+    container_name: smart-starterkit-redis-staging
+    restart: unless-stopped
+    ports:
+      - "6381:6379"  # Different port for staging
+    volumes:
+      - redis_staging_data:/data
+    networks:
+      - smart-starterkit-staging-network
+
+  # Server (Staging)
+  server:
+    image: ghcr.io/${IMAGE_NAME:-smart-starterkit}/server:staging
+    container_name: smart-starterkit-server-staging
+    restart: unless-stopped
+    environment:
+      NODE_ENV: staging
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: smart_starterkit_staging
+      DB_USER: staging_user
+      DB_PASSWORD: staging_password_change_me
+      JWT_SECRET: staging-jwt-secret-change-me
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGIN: https://staging.yourapp.com
+    ports:
+      - "3002:3000"  # Different port for staging
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - smart-starterkit-staging-network
+    volumes:
+      - server_staging_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Client (Staging)
+  client:
+    image: ghcr.io/${IMAGE_NAME:-smart-starterkit}/client:staging
+    container_name: smart-starterkit-client-staging
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: https://staging-api.yourapp.com
+      VITE_APP_NAME: Smart Starterkit (Staging)
+    ports:
+      - "81:80"  # Different port for staging
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - smart-starterkit-staging-network
+
+volumes:
+  mysql_staging_data:
+    driver: local
+  redis_staging_data:
+    driver: local
+  server_staging_logs:
+    driver: local
+
+networks:
+  smart-starterkit-staging-network:
+    driver: bridge

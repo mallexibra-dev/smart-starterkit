@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  # MySQL Database (Development)
+  mysql:
+    image: mysql:8.0
+    container_name: smart-starterkit-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: smart_starterkit_dev
+      MYSQL_USER: dev_user
+      MYSQL_PASSWORD: dev_password
+    ports:
+      - "3307:3306"  # Different port to avoid conflicts
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+    networks:
+      - smart-starterkit-dev-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis (Development)
+  redis:
+    image: redis:7-alpine
+    container_name: smart-starterkit-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - smart-starterkit-dev-network
+
+  # Server (Development) - Hot reload
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: smart-starterkit-server-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: smart_starterkit_dev
+      DB_USER: dev_user
+      DB_PASSWORD: dev_password
+      JWT_SECRET: dev-jwt-secret-key
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3000"  # Different port to avoid conflicts
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - smart-starterkit-dev-network
+    volumes:
+      - ./server/src:/app/src
+      - ./server/database:/app/database
+      - ./server/utils:/app/utils
+      - ./server/package.json:/app/package.json
+      - ./server/tsconfig.json:/app/tsconfig.json
+      - server_dev_logs:/app/logs
+    command: ["bun", "run", "dev"]  # Development command with hot reload
+
+  # Client (Development) - Hot reload
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: smart-starterkit-client-dev
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3001
+    ports:
+      - "5174:5173"  # Different port to avoid conflicts
+    depends_on:
+      - server
+    networks:
+      - smart-starterkit-dev-network
+    volumes:
+      - ./client/src:/app/src
+      - ./client/public:/app/public
+      - ./client/package.json:/app/package.json
+      - ./client/tsconfig.json:/app/tsconfig.json
+      - ./client/vite.config.ts:/app/vite.config.ts
+    command: ["bun", "run", "dev", "--host", "0.0.0.0"]  # Development command with hot reload
+
+volumes:
+  mysql_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  server_dev_logs:
+    driver: local
+
+networks:
+  smart-starterkit-dev-network:
+    driver: bridge

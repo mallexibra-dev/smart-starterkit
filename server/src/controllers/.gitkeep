@@ -1,0 +1,4 @@
+# This file ensures the controller directory is tracked by Git
+# even when it's empty. Request handlers for API endpoints will be added here
+# as the application grows. Controllers receive request parameters and coordinate
+# with services to handle business logic.

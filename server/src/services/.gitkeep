@@ -1,0 +1,4 @@
+# This file ensures the service directory is tracked by Git
+# even when it's empty. Business logic services will be added here
+# as the application grows. Services handle data processing, database operations,
+# and core business rules separate from controllers.

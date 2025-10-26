@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { swaggerUI } from '@hono/swagger-ui'
-import routes from './route'
+import routes from './routes'
 import { requestLogger } from './middlewares/logs.middleware'
 
 const app = new OpenAPIHono()

@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { ToastProvider } from "@/components/blocks/toast";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "./contexts/auth.context";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -31,14 +33,25 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <ToastProvider>
-            <RouterProvider router={router} />
-            <Toaster />
-          </ToastProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
+      <ErrorBoundary
+        onError={(error, errorInfo) => {
+          // Log to error tracking service in production
+          if (process.env.NODE_ENV === 'production') {
+            console.error('Production error:', error, errorInfo);
+          }
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <ToastProvider>
+              <AuthProvider>
+                <RouterProvider router={router} />
+                <Toaster />
+              </AuthProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
     </StrictMode>
   );
 }

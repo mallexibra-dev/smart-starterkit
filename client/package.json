@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -84,6 +88,13 @@
     "tw-animate-css": "^1.3.4",
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.34.0",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "@vitest/ui": "^2.1.8",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/jest-dom": "^6.7.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/react-hooks": "^8.0.1",
+    "jsdom": "^25.0.1",
+    "vitest": "^2.1.8"
   }
 }

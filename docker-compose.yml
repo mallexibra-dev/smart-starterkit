@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: smart-starterkit-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: smart_starterkit
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./server/database/query.sql:/docker-entrypoint-initdb.d/query.sql:ro
+    networks:
+      - smart-starterkit-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: smart-starterkit-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - smart-starterkit-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+
+  # Server (Backend)
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: smart-starterkit-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: smart_starterkit
+      DB_USER: app_user
+      DB_PASSWORD: app_password
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - smart-starterkit-network
+    volumes:
+      - server_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Client (Frontend)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: smart-starterkit-client
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    networks:
+      - smart-starterkit-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  server_logs:
+    driver: local
+
+networks:
+  smart-starterkit-network:
+    driver: bridge

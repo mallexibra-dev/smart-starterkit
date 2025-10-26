@@ -1,0 +1,24 @@
+# Development Dockerfile with hot reload
+FROM oven/bun:1-alpine AS base
+
+WORKDIR /app
+
+# Install dependencies
+COPY package.json bun.lock* ./
+RUN bun install
+
+# Copy source code
+COPY . .
+
+# Create non-root user
+RUN addgroup --system --gid 1001 bun
+RUN adduser --system --uid 1001 bun
+
+# Switch to non-root user
+USER bun
+
+# Expose port
+EXPOSE 5173
+
+# Development command will be overridden by docker-compose
+CMD ["bun", "run", "dev", "--host", "0.0.0.0"]

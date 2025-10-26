@@ -5,13 +5,20 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "bun --watch run src/index.ts"
+    "dev": "bun --watch run src/index.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^1.1.0",
     "@prisma/client": "^6.15.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.2",
     "hono": "^4.9.7",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.3",
     "prisma": "^6.15.0",
     "shared": "workspace:*",
@@ -19,6 +26,10 @@
     "zod": "^4.1.8"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@vitest/ui": "^2.1.8",
+    "vitest": "^2.1.8",
+    "supertest": "^7.0.0",
+    "zod": "^3.22.4"
   }
 }
