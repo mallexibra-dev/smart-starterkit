@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Code, Database, Zap, Globe, Shield, Clock } from "lucide-react";
-import { Navigation, HeroSection, FeaturesGrid, BlogPreview, CTASection, Footer } from "@/components/blocks/landing";
+import { Navigation, HeroSection, FeaturesGrid, CTASection, Footer } from "@/components/blocks/landing";
+import { ThemeProvider } from "@/components/theme-provider";
 
 function Index() {
   // Define features data
@@ -79,39 +80,13 @@ function Index() {
     }
   ];
 
-  // Define blog posts data
-  const blogPosts = [
-    {
-      id: "1",
-      title: "Getting Started with TypeScript in 2024",
-      excerpt: "Learn the best practices and latest features for building type-safe applications.",
-      date: "Nov 15, 2024",
-      gradient: "bg-gradient-to-br from-blue-500 to-purple-600"
-    },
-    {
-      id: "2",
-      title: "Building REST APIs with Hono",
-      excerpt: "Discover how to create fast, type-safe APIs using the modern Hono framework.",
-      date: "Nov 10, 2024",
-      gradient: "bg-gradient-to-br from-green-500 to-cyan-600"
-    },
-    {
-      id: "3",
-      title: "PostgreSQL Best Practices",
-      excerpt: "Essential tips for designing and optimizing PostgreSQL databases for modern apps.",
-      date: "Nov 5, 2024",
-      gradient: "bg-gradient-to-br from-orange-500 to-red-600"
-    }
-  ];
-
   // Define footer sections
   const footerSections = [
     {
       title: "Product",
       links: [
         { label: "Features", href: "/features" },
-        { label: "Documentation", href: "/docs" },
-        { label: "Blog", href: "/blog" }
+        { label: "Documentation", href: "/docs" }
       ]
     },
     {
@@ -133,42 +108,51 @@ function Index() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
+    <ThemeProvider defaultTheme="system" storageKey="smart-starterkit-ui-theme">
+      <>
+        {/* Navigation (Fixed) */}
+        <Navigation />
 
-      <HeroSection
-        title={
-          <>
-            Build Amazing Apps
-            <span className="block text-primary">Faster Than Ever</span>
-          </>
-        }
-        subtitle="A modern TypeScript fullstack starterkit with React, Hono, and PostgreSQL. Ship your next project in minutes, not months."
-        primaryAction={{ text: "Get Started" }}
-        secondaryAction={{ text: "View Documentation" }}
-      />
+        {/* Subtle page background gradient */}
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900" />
+        <div className="fixed inset-0 bg-gradient-to-tr from-indigo-100/20 via-transparent to-pink-100/20 dark:from-blue-900/20 dark:via-transparent dark:to-purple-900/20" />
+        <div className="fixed inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.05) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(139, 92, 246, 0.05) 0%, transparent 50%)`
+        }} />
 
-      <FeaturesGrid
-        title="Everything You Need to Succeed"
-        subtitle="Built with modern tools and best practices to help you build production-ready applications."
-        features={features}
-      />
+        {/* Main content */}
+        <div className="min-h-screen bg-background relative pt-16">
+          <div className="relative z-10">
+            <HeroSection
+              title={
+                <>
+                  Build Amazing Apps
+                  <span className="block text-primary">Faster Than Ever</span>
+                </>
+              }
+              subtitle="A modern TypeScript fullstack starterkit with React, Hono, and PostgreSQL. Ship your next project in minutes, not months."
+              primaryAction={{ text: "Get Started" }}
+              secondaryAction={{ text: "View Documentation" }}
+            />
 
-      <BlogPreview
-        title="Latest from the Blog"
-        subtitle="Tips, tutorials, and insights on modern web development with our stack."
-        posts={blogPosts}
-      />
+            <FeaturesGrid
+              title="Everything You Need to Succeed"
+              subtitle="Built with modern tools and best practices to help you build production-ready applications."
+              features={features}
+            />
 
-      <CTASection
-        title="Ready to Build Something Amazing?"
-        subtitle="Join thousands of developers building production-ready applications with Smart Starterkit."
-        primaryAction={{ text: "Get Started on GitHub" }}
-        secondaryAction={{ text: "View Documentation" }}
-      />
+            <CTASection
+              title="Ready to Build Something Amazing?"
+              subtitle="Join thousands of developers building production-ready applications with Smart Starterkit."
+              primaryAction={{ text: "Get Started on GitHub" }}
+              secondaryAction={{ text: "View Documentation" }}
+            />
 
-      <Footer sections={footerSections} />
-    </div>
+            <Footer sections={footerSections} />
+          </div>
+        </div>
+      </>
+    </ThemeProvider>
   );
 }
 
