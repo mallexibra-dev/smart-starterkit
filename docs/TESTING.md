@@ -1,74 +1,87 @@
 # Testing Guide
 
-Simple and efficient testing setup for the Smart Starterkit project.
+Comprehensive testing strategies and setup for the Smart Starterkit project with modern testing frameworks and best practices.
 
 ## 🏗️ Testing Structure
 
 ```
 smart-starterkit/
-├── client/
-│   └── tests/
-│       ├── components.test.tsx    # React component tests
-│       ├── utils.test.ts          # Utility function tests
-│       ├── hooks.test.tsx         # Custom hook tests
-│       ├── services.test.ts       # API service tests (optional)
-│       └── setup.ts              # Client test setup and mocks
+├── client/                    # React 19 + Vite frontend
+│   ├── tests/
+│   │   ├── components.test.tsx    # React component tests
+│   │   ├── utils.test.ts          # Utility function tests
+│   │   ├── hooks.test.tsx         # Custom hook tests
+│   │   ├── services.test.ts       # TanStack Query service tests
+│   │   └── setup.ts              # Client test setup and mocks
 │   └── vitest.config.ts          # Client test configuration
-├── server/
-│   └── tests/
-│       ├── api.test.ts           # API endpoint tests
-│       ├── middleware.test.ts    # Middleware tests
-│       └── setup.ts              # Server test setup and mocks
+├── server/                    # Hono + PostgreSQL backend
+│   ├── tests/
+│   │   ├── api.test.ts           # API endpoint tests
+│   │   ├── controllers.test.ts   # Controller tests
+│   │   ├── middleware.test.ts    # Middleware tests
+│   │   ├── db.test.ts            # Database operation tests
+│   │   └── setup.ts              # Server test setup and mocks
 │   └── vitest.config.ts          # Server test configuration
-└── docs/TESTING.md               # This documentation
+├── shared/                    # Shared types and validation
+│   ├── tests/
+│   │   ├── types.test.ts         # Type validation tests
+│   │   ├── validation.test.ts    # Zod schema tests
+│   │   └── utils.test.ts         # Shared utility tests
+│   └── vitest.config.ts          # Shared test configuration
+└── docs/TESTING.md             # This documentation
 ```
+
+## 🤖 Testing with Claude Agents
+
+This project includes a **testing-specialist** agent that can help you:
+
+- **Set up comprehensive test suites** for new features
+- **Review and improve existing tests**
+- **Create testing strategies** for complex scenarios
+- **Set up test infrastructure** and mocking strategies
+
+**When to use the testing-specialist agent:**
+- "I need to add tests for my new API endpoints"
+- "Can you help me test my React component?"
+- "I want to improve my test coverage"
+- "Set up testing for my new feature"
 
 ## 🚀 Running Tests
 
-### From Root Directory
+### Root Level Commands
 ```bash
-# Run all tests (client + server)
+# Run all tests (client + server + shared)
 bun run test
-
-# Run only client tests
-bun run test:client
-
-# Run only server tests
-bun run test:server
 
 # Run tests with coverage
 bun run test:coverage
+```
 
-# Run all tests for CI
+### Individual Workspace Tests
+```bash
+# Client tests only
+cd client && bun run test
+
+# Server tests only
+cd server && bun run test
+
+# Shared package tests only
+cd shared && bun run test
+```
+
+### Test Modes
+```bash
+# Run tests in watch mode (development)
+bun run test
+
+# Run tests once (CI/build)
+bun run test:run
+
+# Run tests with coverage report
+bun run test:coverage
+
+# Run tests in CI mode
 bun run test:ci
-```
-
-### Client Tests
-```bash
-cd client
-
-# Run tests in watch mode
-bun run test
-
-# Run tests once
-bun run test:run
-
-# Run with coverage
-bun run test:coverage
-```
-
-### Server Tests
-```bash
-cd server
-
-# Run tests in watch mode
-bun run test
-
-# Run tests once
-bun run test:run
-
-# Run with coverage
-bun run test:coverage
 ```
 
 ## 🧪 Writing Tests
@@ -301,52 +314,86 @@ bunx vitest path/to/test.test.ts
 - Keep tests isolated and deterministic
 - Mock shared utilities when testing middleware
 
-## 🎯 Quick Start
+## 🎯 Testing Best Practices for This Project
 
-1. **Run existing tests** to see how they work:
+### 1. Follow Project Patterns
+- **Use existing test setup** from `tests/setup.ts`
+- **Follow naming conventions** (`*.test.ts` or `*.test.tsx`)
+- **Test components in isolation** with proper mocking
+- **Use TanStack Query testing utilities** for API testing
+
+### 2. Focus on What Matters
+- **Test business logic** not implementation details
+- **Test user interactions** not component internals
+- **Test error scenarios** not just happy paths
+- **Test integration points** between client and server
+
+### 3. Use the Right Testing Strategy
+- **Unit Tests** - Pure functions, utilities, hooks
+- **Component Tests** - React components with user interactions
+- **Integration Tests** - API endpoints with database
+- **E2E Tests** - Critical user workflows (optional)
+
+## 🎯 Quick Start for Testing
+
+1. **Run existing tests** to understand patterns:
    ```bash
-   bun run test:client
-   bun run test:server
+   cd client && bun run test    # See frontend test patterns
+   cd server && bun run test    # See backend test patterns
    ```
 
-2. **Add new test files** in the appropriate directories:
-   - `client/tests/` for React components, utilities, hooks, and services
-   - `server/tests/` for API endpoints, middleware, and server utilities
+2. **Use the testing-specialist agent** for new features:
+   - "I need tests for my new user management feature"
+   - "Can you set up testing for my React component?"
+   - "Help me test my API endpoints"
 
-3. **Follow the patterns** shown in example test files
+3. **Follow established patterns** in existing test files
 
-4. **Keep it simple** - Focus on testing what matters
+4. **Focus on critical functionality** - don't test everything
 
-## 📋 What's Tested (and What's Not)
+## 📋 Testing Philosophy
 
-### ✅ Currently Tested:
-- Client utilities (cn function)
-- Client hooks (useIsMobile)
-- Server middleware (validation, auth)
-- Basic API functionality
-- Component examples
+### ✅ What We Test
+- **Business logic** and user-facing functionality
+- **API endpoints** and database operations
+- **React components** with user interactions
+- **Custom hooks** and utilities
+- **Error handling** and edge cases
 
-### ⚠️ Not Tested (by design):
-- **Shared utilities** - Pure functions, tested in consuming workspaces
-- **Third-party libraries** - Assume they work correctly
-- **Configuration files** - Not worth testing
+### ⚠️ What We Don't Test (by design)
+- **Third-party libraries** - Assume they work
 - **Type definitions** - Validated by TypeScript
+- **Configuration files** - Not worth testing
+- **Styling** - Visual testing is separate
+- **Simple getters/setters** - Too trivial
 
-### 🔧 Developer Responsibility:
-When adding new features, add tests for:
-- New utility functions
-- Custom hooks
-- API endpoints
-- Middleware
-- Complex business logic
+### 🔧 Developer Responsibility
+When adding features, ensure tests cover:
+- **New API endpoints** with success/error cases
+- **React components** with user interactions
+- **Custom hooks** with different states
+- **Complex business logic** with edge cases
+- **Error handling** and validation
 
-## 📋 Optional: E2E Testing
+## 🤖 Getting Help with Testing
 
-For full-stack applications, you might want to add E2E testing later. Popular options:
-- **Playwright** - Modern, fast, multi-browser support
-- **Cypress** - Developer-friendly, great dashboard
-- **TestCafe** - Simple setup, good for beginners
+Use the **testing-specialist** agent for:
+- Setting up test suites for new features
+- Improving test coverage
+- Creating testing strategies
+- Reviewing existing tests
 
-But for most starterkit use cases, unit + integration tests are sufficient! 🚀
+**Example usage:**
+```
+"I need comprehensive tests for my new user authentication system"
+```
 
-That's it! Minimal but complete testing setup focused on what matters.
+The agent will help you set up:
+- Unit tests for authentication logic
+- Integration tests for API endpoints
+- Component tests for login forms
+- Error handling and edge case testing
+
+---
+
+**Remember**: Good tests focus on behavior, not implementation. Use the testing-specialist agent to maintain consistency and quality across your test suite! 🚀
