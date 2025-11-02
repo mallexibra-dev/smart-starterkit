@@ -1,10 +1,8 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
-import productRoute from "./product.route";
-import categoryRoute from "./category.route";
+import authRoute from "./auth.route";
 
 const app = new OpenAPIHono();
 
-app.route("/products", productRoute);
-app.route("/categories", categoryRoute);
+app.route("/auth", authRoute);
 
 export default app;

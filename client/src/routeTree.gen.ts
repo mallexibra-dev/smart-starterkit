@@ -16,8 +16,10 @@ import { Route as ProductsIdRouteImport } from './routes/products/$id'
 import { Route as ProductsLowStockIndexRouteImport } from './routes/products/low-stock/index'
 import { Route as ProductsCreateIndexRouteImport } from './routes/products/create/index'
 import { Route as CategoriesCreateIndexRouteImport } from './routes/categories/create/index'
+import { Route as appAuthIndexRouteImport } from './routes/(app)/auth/index'
 import { Route as ProductsEditIdRouteImport } from './routes/products/edit/$id'
 import { Route as CategoriesEditIdRouteImport } from './routes/categories/edit/$id'
+import { Route as appAuthLoginIndexRouteImport } from './routes/(app)/auth/login/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -54,6 +56,11 @@ const CategoriesCreateIndexRoute = CategoriesCreateIndexRouteImport.update({
   path: '/categories/create/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const appAuthIndexRoute = appAuthIndexRouteImport.update({
+  id: '/(app)/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProductsEditIdRoute = ProductsEditIdRouteImport.update({
   id: '/products/edit/$id',
   path: '/products/edit/$id',
@@ -64,6 +71,11 @@ const CategoriesEditIdRoute = CategoriesEditIdRouteImport.update({
   path: '/categories/edit/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const appAuthLoginIndexRoute = appAuthLoginIndexRouteImport.update({
+  id: '/(app)/auth/login/',
+  path: '/auth/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -72,9 +84,11 @@ export interface FileRoutesByFullPath {
   '/products': typeof ProductsIndexRoute
   '/categories/edit/$id': typeof CategoriesEditIdRoute
   '/products/edit/$id': typeof ProductsEditIdRoute
+  '/auth': typeof appAuthIndexRoute
   '/categories/create': typeof CategoriesCreateIndexRoute
   '/products/create': typeof ProductsCreateIndexRoute
   '/products/low-stock': typeof ProductsLowStockIndexRoute
+  '/auth/login': typeof appAuthLoginIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,9 +97,11 @@ export interface FileRoutesByTo {
   '/products': typeof ProductsIndexRoute
   '/categories/edit/$id': typeof CategoriesEditIdRoute
   '/products/edit/$id': typeof ProductsEditIdRoute
+  '/auth': typeof appAuthIndexRoute
   '/categories/create': typeof CategoriesCreateIndexRoute
   '/products/create': typeof ProductsCreateIndexRoute
   '/products/low-stock': typeof ProductsLowStockIndexRoute
+  '/auth/login': typeof appAuthLoginIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,9 +111,11 @@ export interface FileRoutesById {
   '/products/': typeof ProductsIndexRoute
   '/categories/edit/$id': typeof CategoriesEditIdRoute
   '/products/edit/$id': typeof ProductsEditIdRoute
+  '/(app)/auth/': typeof appAuthIndexRoute
   '/categories/create/': typeof CategoriesCreateIndexRoute
   '/products/create/': typeof ProductsCreateIndexRoute
   '/products/low-stock/': typeof ProductsLowStockIndexRoute
+  '/(app)/auth/login/': typeof appAuthLoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -108,9 +126,11 @@ export interface FileRouteTypes {
     | '/products'
     | '/categories/edit/$id'
     | '/products/edit/$id'
+    | '/auth'
     | '/categories/create'
     | '/products/create'
     | '/products/low-stock'
+    | '/auth/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -119,9 +139,11 @@ export interface FileRouteTypes {
     | '/products'
     | '/categories/edit/$id'
     | '/products/edit/$id'
+    | '/auth'
     | '/categories/create'
     | '/products/create'
     | '/products/low-stock'
+    | '/auth/login'
   id:
     | '__root__'
     | '/'
@@ -130,9 +152,11 @@ export interface FileRouteTypes {
     | '/products/'
     | '/categories/edit/$id'
     | '/products/edit/$id'
+    | '/(app)/auth/'
     | '/categories/create/'
     | '/products/create/'
     | '/products/low-stock/'
+    | '/(app)/auth/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -142,9 +166,11 @@ export interface RootRouteChildren {
   ProductsIndexRoute: typeof ProductsIndexRoute
   CategoriesEditIdRoute: typeof CategoriesEditIdRoute
   ProductsEditIdRoute: typeof ProductsEditIdRoute
+  appAuthIndexRoute: typeof appAuthIndexRoute
   CategoriesCreateIndexRoute: typeof CategoriesCreateIndexRoute
   ProductsCreateIndexRoute: typeof ProductsCreateIndexRoute
   ProductsLowStockIndexRoute: typeof ProductsLowStockIndexRoute
+  appAuthLoginIndexRoute: typeof appAuthLoginIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -198,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesCreateIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(app)/auth/': {
+      id: '/(app)/auth/'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof appAuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/products/edit/$id': {
       id: '/products/edit/$id'
       path: '/products/edit/$id'
@@ -212,6 +245,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesEditIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(app)/auth/login/': {
+      id: '/(app)/auth/login/'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof appAuthLoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -222,9 +262,11 @@ const rootRouteChildren: RootRouteChildren = {
   ProductsIndexRoute: ProductsIndexRoute,
   CategoriesEditIdRoute: CategoriesEditIdRoute,
   ProductsEditIdRoute: ProductsEditIdRoute,
+  appAuthIndexRoute: appAuthIndexRoute,
   CategoriesCreateIndexRoute: CategoriesCreateIndexRoute,
   ProductsCreateIndexRoute: ProductsCreateIndexRoute,
   ProductsLowStockIndexRoute: ProductsLowStockIndexRoute,
+  appAuthLoginIndexRoute: appAuthLoginIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
