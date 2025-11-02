@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Star, Mail, Phone, MapPin, Edit, Trash, Eye, Download } from "lucide-react"
+import { MoreHorizontal, Star, Mail, Phone, MapPin, Edit, Trash, Eye, Download, Inbox, Search, Filter } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface TableColumn {
@@ -56,6 +56,19 @@ interface TableAdvancedProps {
   pageSize?: number
   onPageChange?: (page: number) => void
   totalItems?: number
+  // Empty state props
+  emptyState?: {
+    title?: string
+    description?: string
+    icon?: React.ReactNode
+    action?: {
+      label: string
+      onClick: () => void
+      variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive"
+    }
+  }
+  showEmptyState?: boolean
+  loading?: boolean
 }
 
 // Example render functions for different column types
@@ -179,6 +192,30 @@ export const defaultActions = {
   }
 }
 
+// Preset empty states for convenience
+export const emptyStates = {
+  noData: {
+    title: "No data available",
+    description: "There are no items to display at the moment.",
+    icon: <Inbox className="h-12 w-12 text-muted-foreground" />
+  },
+  noSearchResults: {
+    title: "No results found",
+    description: "We couldn't find any results matching your search criteria.",
+    icon: <Search className="h-12 w-12 text-muted-foreground" />
+  },
+  noFilters: {
+    title: "No items match your filters",
+    description: "Try adjusting your filter settings to see more results.",
+    icon: <Filter className="h-12 w-12 text-muted-foreground" />
+  },
+  error: {
+    title: "Failed to load data",
+    description: "There was an error loading the data. Please try again later.",
+    icon: <Inbox className="h-12 w-12 text-destructive" />
+  }
+}
+
 export function TableAdvanced({
   data,
   columns,
@@ -197,7 +234,10 @@ export function TableAdvanced({
   totalPages = 1,
   pageSize = 10,
   onPageChange,
-  totalItems
+  totalItems,
+  emptyState,
+  showEmptyState = true,
+  loading = false
 }: TableAdvancedProps) {
   const [internalSelection, setInternalSelection] = useState<string[]>(selectedRows)
 
@@ -227,6 +267,48 @@ export function TableAdvanced({
 
   const isAllSelected = data.length > 0 && currentSelection.length === data.length
   const hasBulkActions = bulkActions.length > 0 && currentSelection.length > 0 && showBulkActions
+
+  // Empty state component
+  const renderEmptyState = () => {
+    if (!showEmptyState) return null
+
+    const defaultEmptyState = {
+      title: "No data available",
+      description: "There are no items to display at the moment.",
+      icon: <Inbox className="h-12 w-12 text-muted-foreground" />
+    }
+
+    const state = emptyState || defaultEmptyState
+
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="mt-4 text-sm text-muted-foreground">Loading...</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+          {state.icon}
+        </div>
+        <h3 className="text-lg font-semibold mb-2">{state.title}</h3>
+        <p className="text-sm text-muted-foreground text-center max-w-md mb-6">
+          {state.description}
+        </p>
+        {'action' in state && state.action && (
+          <Button
+            variant={state.action.variant || "default"}
+            onClick={state.action.onClick}
+          >
+            {state.action.label}
+          </Button>
+        )}
+      </div>
+    )
+  }
 
   // Built-in action render function
   const renderActions = (_value: any, row: any, index: number) => (
@@ -291,6 +373,24 @@ export function TableAdvanced({
       )}
     </div>
   )
+
+  // Handle loading state
+  if (loading) {
+    return (
+      <div className={cn("rounded-md border", className)}>
+        {renderEmptyState()}
+      </div>
+    )
+  }
+
+  // Handle empty data
+  if (data.length === 0) {
+    return (
+      <div className={cn("rounded-md border", className)}>
+        {renderEmptyState()}
+      </div>
+    )
+  }
 
   return (
     <div className={cn("rounded-md border", className)}>
@@ -365,7 +465,7 @@ export function TableAdvanced({
                     {column.render
                       ? column.render(row[column.key], row, index)
                       : renderers[column.key]
-                        ? renderers[column.key](row[column.key], row)
+                        ? renderers[column.key]!(row[column.key], row)
                         : row[column.key]
                     }
                   </TableCell>

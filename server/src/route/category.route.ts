@@ -91,7 +91,7 @@ router.openapi(
     path: '/{id}',
     request: {
       params: z.object({
-        id: z.number().openapi({ example: 1 })
+        id: z.coerce.number().openapi({ example: 1 })
       })
     },
     responses: {
@@ -196,7 +196,7 @@ router.openapi(
     path: '/{id}',
     request: {
       params: z.object({
-        id: z.number().openapi({ example: 1 })
+        id: z.coerce.number().openapi({ example: 1 })
       }),
       body: {
         content: {
@@ -277,7 +277,7 @@ router.openapi(
     path: '/{id}',
     request: {
       params: z.object({
-        id: z.number().openapi({ example: 1 })
+        id: z.coerce.number().openapi({ example: 1 })
       })
     },
     responses: {

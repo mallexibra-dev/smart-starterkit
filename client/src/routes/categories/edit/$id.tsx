@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ContainerLayout } from "@/components/layout/container-layout";
-import { CategoryDetail } from "../-components/category-detail";
+import { CategoryForm } from "../-components/category-form";
 
 export const Route = createFileRoute("/categories/edit/$id")({
   component: CategoryEditPage,
@@ -11,7 +11,7 @@ function CategoryEditPage() {
 
   return (
     <ContainerLayout title="Edit Category">
-      <CategoryDetail categoryId={parseInt(id)} />
+      <CategoryForm mode="edit" categoryId={parseInt(id)} />
     </ContainerLayout>
   );
 }
