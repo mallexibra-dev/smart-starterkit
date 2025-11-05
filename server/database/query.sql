@@ -30,8 +30,8 @@ CREATE TABLE `sessions` (
   UNIQUE KEY `sessions_refresh_token_unique` (`refresh_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Seed data
+-- Seed data (password: password123 for all users)
 INSERT INTO `users` (`name`, `username`, `email`, `password`) VALUES
-('Alice Example', 'alice', 'alice@example.com', NULL),
-('Bob Example', 'bob', 'bob@example.com', NULL),
-('Charlie Example', 'charlie', 'charlie@example.com', NULL);
+('Alice Example', 'alice', 'alice@example.com', '$argon2id$v=19$m=65536,t=2,p=1$qmnACr+e+ghMmSwRnUL8qO8iugi/4wimNIqnRjsdujU$+JHULuK+qJGh9Ht0OpwS5FBupCK7RzP1DIs/VUAUXyc'),
+('Bob Example', 'bob', 'bob@example.com', '$argon2id$v=19$m=65536,t=2,p=1$qmnACr+e+ghMmSwRnUL8qO8iugi/4wimNIqnRjsdujU$+JHULuK+qJGh9Ht0OpwS5FBupCK7RzP1DIs/VUAUXyc'),
+('Charlie Example', 'charlie', 'charlie@example.com', '$argon2id$v=19$m=65536,t=2,p=1$qmnACr+e+ghMmSwRnUL8qO8iugi/4wimNIqnRjsdujU$+JHULuK+qJGh9Ht0OpwS5FBupCK7RzP1DIs/VUAUXyc');
