@@ -50,27 +50,3 @@ export function transformZodErrors(error: any): Record<string, string> {
 
   return errors;
 }
-
-// Check if value is empty (null, undefined, empty string, empty array)
-export function isEmpty(value: any): boolean {
-  if (value === null || value === undefined) return true;
-  if (typeof value === 'string' && value.trim() === '') return true;
-  if (Array.isArray(value) && value.length === 0) return true;
-  return false;
-}
-
-// Sanitize string values (trim and remove extra whitespace)
-export function sanitizeString(value: string | null | undefined): string | null {
-  if (isEmpty(value)) return null;
-  return value!.trim().replace(/\s+/g, ' ');
-}
-
-// Transform string to URL-friendly slug
-export function toSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
-    .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
-}

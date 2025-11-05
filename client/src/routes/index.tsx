@@ -3,28 +3,19 @@ import { ContainerLayout } from "@/components/layout/container-layout";
 
 function Index() {
   return (
-    <ContainerLayout title="Smart Starterkit">
+    <ContainerLayout title="Welcome">
       <div className="space-y-6">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Welcome to Smart Starterkit</h1>
+          <h1 className="text-4xl font-bold">Smart Starterkit</h1>
           <p className="text-xl text-muted-foreground">
-            A modern TypeScript fullstack starterkit
+            A clean, modern TypeScript fullstack starterkit
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Frontend</h3>
-            <p className="text-muted-foreground">React 19 + Vite + Tailwind CSS</p>
-          </div>
-          <div className="p-6 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Backend</h3>
-            <p className="text-muted-foreground">Hono + PostgreSQL + TypeScript</p>
-          </div>
-          <div className="p-6 border rounded-lg">
-            <h3 className="text-lg font-semibold mb-2">Tools</h3>
-            <p className="text-muted-foreground">Docker + Testing + ESLint</p>
-          </div>
+        <div className="text-center">
+          <p className="text-muted-foreground">
+            Start building your amazing application here!
+          </p>
         </div>
       </div>
     </ContainerLayout>

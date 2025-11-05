@@ -10,8 +10,6 @@ const db = drizzle(pool, { schema });
 
 export { db, schema };
 
-// Export tables for convenience
-export const { users } = schema;
-
-// Export types
-export type { User, NewUser } from './schema';
+// Export tables and types will be added here when you create database tables
+// export const { users } = schema;
+// export type { User, NewUser } from './schema';

@@ -1,2 +1,2 @@
-# This directory is for TanStack Query service functions and hooks
-# Add your API service files here
+# This directory is for API services with TanStack Query hooks
+# Service files will be added here as needed when features require API calls.

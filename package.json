@@ -1,10 +1,9 @@
 {
   "name": "smart-starterkit",
   "version": "0.4.0",
-  "description": "A monorepo template built with Bun, Hono, Vite, and React",
-  "author": "Steve Simkins",
+  "description": "A clean, modern TypeScript fullstack starterkit",
+  "author": "Smart Starterkit",
   "license": "MIT",
-  "homepage": "https://github.com/stevedylandev/bhvr",
   "packageManager": "bun@1.2.4",
   "workspaces": [
     "./server",
@@ -25,19 +24,7 @@
     "test:server": "turbo test --filter=server",
     "test:coverage": "turbo test:coverage",
     "test:ci": "turbo test:run",
-    "postinstall": "turbo build --filter=shared --filter=server",
-    "setup": "./scripts/setup.sh",
-    "deploy": "./scripts/deploy.sh",
-    "deploy:dev": "./scripts/deploy.sh dev",
-    "deploy:staging": "./scripts/deploy.sh staging",
-    "deploy:prod": "./scripts/deploy.sh prod",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
-    "docker:prod": "docker-compose up -d",
-    "docker:staging": "docker-compose -f docker-compose.staging.yml up -d"
+    "postinstall": "turbo build --filter=shared --filter=server"
   },
   "keywords": [
     "bun",

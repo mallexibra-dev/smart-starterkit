@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
-import { Toaster } from "@/components/ui/sonner";
 import { ErrorBoundary } from "./components/layout/error-boundary";
 import "./index.css";
 
@@ -42,7 +41,6 @@ if (!rootElement.innerHTML) {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider>
             <RouterProvider router={router} />
-            <Toaster />
           </ThemeProvider>
         </QueryClientProvider>
       </ErrorBoundary>
