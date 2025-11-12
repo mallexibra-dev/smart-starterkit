@@ -1,84 +1,108 @@
 # Smart Starterkit
 
- **Smart Starterkit** adalah template monorepo modern yang dibangun dengan teknologi terdepan untuk pengembangan aplikasi full-stack yang cepat dan efisien.
+**Smart Starterkit** adalah template monorepo modern yang dibangun dengan teknologi terdepan untuk pengembangan aplikasi full-stack yang cepat dan efisien dengan sistem authentication yang lengkap.
 
 ## ✨ Fitur Utama
 
 - **⚡ Bun** - Runtime JavaScript yang super cepat
-- **Hono** - Framework web modern untuk backend
-- **Tanstack Router** - Routing, State and fetching API management
-- **⚛️ React 19** - Library UI terbaru dengan fitur-fitur canggih
-- **🎨 Tailwind CSS** - Framework CSS utility-first
-- **📦 Turbo** - Build system untuk monorepo
-- **🔐 Clerk** - Authentication yang mudah digunakan
-- **📝 React Hook Form** - Form handling yang powerful
+- **🔥 Hono** - Framework web modern untuk backend dengan OpenAPI/Swagger
+- **🚀 Tanstack Router** - Type-safe routing dengan file-based routing
+- **⚛️ React 18** - Library UI yang stabil dan powerful
+- **🎨 Tailwind CSS 4** - Framework CSS utility-first terbaru
+- **📦 Turbo** - Build system untuk monorepo yang efisien
+- **🔐 JWT Authentication** - Simple JWT-based authentication system
+- **📝 React Hook Form** - Form handling yang powerful dengan Zod validation
 - **✅ Zod** - Schema validation yang type-safe
 - **🌐 Axios** - HTTP client untuk API calls
 - **🎯 TypeScript** - Type safety di seluruh project
 - **🎨 shadcn/ui** - Beautiful & accessible UI components
-- **🗄️ MySQL** - Database dengan connection pooling
+- **🗄️ MySQL** - Database dengan Drizzle ORM
+- **📊 Swagger/OpenAPI** - API documentation otomatis
+- **🪝 React Query** - Data fetching dan caching
 
-##  Struktur Project
+## 🛠️ Tech Stack
+
+### Frontend (Client)
+- **React 18.3** - UI library yang stabil
+- **Vite 5.4** - Build tool yang super cepat
+- **TanStack Router** - Type-safe routing dengan file-based
+- **TanStack Query** - Data fetching & caching
+- **Tailwind CSS 4.1** - Utility-first CSS framework
+- **shadcn/ui** - Beautiful & accessible UI components
+- **Radix UI** - Accessible component primitives
+- **React Hook Form** - Performant form handling
+- **Axios** - HTTP client untuk API calls
+- **Zod** - Schema validation
+
+### Backend (Server)
+- **Hono 4.9** - Lightweight web framework
+- **Bun Runtime** - Fast JavaScript runtime
+- **JWT + bcryptjs** - Simple authentication system
+- **Drizzle ORM** - Type-safe SQL toolkit
+- **MySQL** - Relational database
+- **Winston** - Logging library
+- **Swagger/OpenAPI** - API documentation
+- **TypeScript** - Type safety
+
+### Database & Development Tools
+- **Drizzle Kit** - Database migrations & management
+- **Turbo** - Monorepo build system
+- **ESLint** - Code linting
+- **TypeScript** - Static type checking
+
+## 📁 Struktur Project
 
 ```
 smart-starterkit/
 ├── 📁 client/                     # Frontend React App
 │   ├── 📁 src/
-│   │   ├── 📁 components/
+│   │   ├── 📁 components/         # Reusable components
 │   │   │   └── 📁 ui/            # shadcn/ui components
-│   │   │       └── 📄 button.tsx
 │   │   ├── 📁 routes/            # TanStack Router
-│   │   │   ├── 📄 __root.tsx
-│   │   │   ├── 📄 index.tsx
-│   │   │   └── 📁 users/         # User routes
+│   │   │   ├── 📁 (app)/         # Protected routes
+│   │   │   │   └── 📁 auth/      # Authentication pages
+│   │   │   │       ├── 📁 login/
+│   │   │   │       └── 📁 register/
+│   │   │   ├── 📄 __root.tsx     # Root layout
+│   │   │   └── 📄 index.tsx      # Homepage
+│   │   ├── 📁 hooks/             # Custom React hooks
+│   │   ├── 📁 services/          # API services
 │   │   ├── 📁 lib/               # Utility functions
-│   │   │   ├── 📄 axios.ts       # HTTP client config
-│   │   │   └── 📄 utils.ts       # Helper functions
-│   │   ├── 📁 assets/            # Static assets
 │   │   ├── 📄 main.tsx           # App entry point
-│   │   ├── 📄 index.css          # Global styles
 │   │   └── 📄 routeTree.gen.ts   # Generated route tree
 │   ├── 📁 public/                # Public assets
-│   ├── 📁 dist/                  # Build output
-│   ├── 📁 node_modules/          # Dependencies
 │   ├── 📄 package.json           # Client dependencies
-│   ├── 📄 vite.config.ts         # Vite configuration
-│   ├── 📄 components.json        # shadcn/ui config
-│   ├── 📄 eslint.config.js       # ESLint configuration
-│   ├── 📄 index.html             # HTML template
-│   └── 📄 README.md              # Client documentation
+│   └── 📄 vite.config.ts         # Vite configuration
 │
 ├── 📁 server/                     # Backend Hono API
 │   ├── 📁 src/
 │   │   ├── 📁 route/             # API routes
-│   │   │   └── 📄 index.ts
+│   │   │   ├── 📄 auth.route.ts  # Authentication routes
+│   │   │   └── 📄 index.ts       # Route aggregation
 │   │   ├── 📁 controller/        # Route controllers
-│   │   │   └── 📄 users.controller.ts
+│   │   │   └── 📄 auth.controller.ts
 │   │   ├── 📁 service/           # Business logic
-│   │   │   └── 📄 users.service.ts
-│   │   ├── 📁 validation/        # Request validation
-│   │   │   └── 📄 users.validation.ts
+│   │   │   └── 📄 auth.service.ts
+│   │   ├── 📁 middlewares/       # Express-like middlewares
+│   │   │   ├── 📄 auth.middleware.ts
+│   │   │   ├── 📄 error.middleware.ts
+│   │   │   ├── 📄 rate-limit.middleware.ts
+│   │   │   └── 📄 security.middleware.ts
+│   │   ├── 📁 lib/               # Server utilities
+│   │   │   └── 📄 auth.ts        # Authentication library
+│   │   ├── 📁 db/                # Database setup
+│   │   │   ├── 📄 schema.ts      # Drizzle schema
+│   │   │   └── 📄 seed.ts        # Database seeding
+│   │   ├── 📄 drizzle.config.ts  # Drizzle configuration
 │   │   └── 📄 index.ts           # Server entry point
-│   ├── 📁 database/              # Database files
-│   │   └── 📄 query.sql          # SQL query
-│   ├── 📁 utils/                 # Server utilities
-│   │   ├── 📄 enums.ts
-│   │   └── 📄 db.ts              # MySQL connection
-│   ├── 📁 dist/                  # Build output
-│   ├── 📄 package.json           # Server dependencies
-│   └── 📄 README.md              # Server documentation
+│   ├── 📄 .env.example           # Environment variables template
+│   └── 📄 package.json           # Server dependencies
 │
 ├── 📁 shared/                     # Shared code & types
-│   ├── 📁 src/
-│   │   ├── 📁 types/             # TypeScript type definitions
-│   │   │   └── 📄 index.ts
-│   │   └── 📄 index.ts           # Shared utilities
-│   ├── 📁 dist/                  # Build output
-│   ├── 📁 node_modules/          # Dependencies
-│   ├── 📄 package.json           # Shared dependencies
-│   └── 📄 tsconfig.json          # TypeScript config
+│   └── 📁 src/
+│       └── 📁 validation/        # Shared validation schemas
+│           └── 📄 auth.validation.ts
 │
-├── 📁 .turbo/                     # Turbo cache
 ├── 📄 package.json               # Root workspace config
 ├── 📄 turbo.json                 # Turbo build configuration
 ├── 📄 tsconfig.json              # Root TypeScript config
@@ -86,42 +110,12 @@ smart-starterkit/
 └── 📄 README.md                  # Project documentation
 ```
 
-Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder dan file yang ada.
-
-## 🛠️ Teknologi yang Digunakan
-
-### Frontend (Client)
-- **React 19** - UI library dengan concurrent features
-- **Vite** - Build tool yang super cepat
-- **TanStack Router** - Type-safe routing
-- **TanStack Query** - Data fetching & caching
-- **Tailwind CSS** - Utility-first CSS framework
-- **shadcn/ui** - Beautiful & accessible UI components
-- **Radix UI** - Accessible component primitives
-- **React Hook Form** - Performant form handling
-- **Clerk** - Authentication & user management
-- **Axios** - HTTP client untuk API calls
-- **Zod** - Schema validation
-
-### Backend (Server)
-- **Hono** - Lightweight web framework
-- **Bun** - Fast JavaScript runtime
-- **MySQL** - Relational database
-- **mysql2** - MySQL client dengan connection pooling
-- **Zod** - Runtime type validation
-- **TypeScript** - Type safety
-
-### Development Tools
-- **Turbo** - Monorepo build system
-- **ESLint** - Code linting
-- **TypeScript** - Static type checking
-
 ## 🚀 Cara Memulai
 
 ### Prerequisites
 - **Bun** v1.2.4 atau lebih baru
-- **Node.js** (opsional, untuk compatibility)
 - **MySQL** database server
+- **Git** (untuk clone repository)
 
 ### Installation
 
@@ -141,25 +135,55 @@ Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder 
    ```bash
    # Buat database MySQL
    mysql -u root -p
-   CREATE DATABASE mydatabase;
-   
-   # Jalankan schema dan seed data
-   mysql -u root -p mydatabase < server/database/query.sql
+   CREATE DATABASE smart_starterkit;
+
+   # Setup environment variables
+   cp server/.env.example server/.env
    ```
 
+4. **Konfigurasi environment variables**
 
-3. **Setup environment variables**
+   **Server (.env)**
+   ```env
+   # Database Configuration
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASSWORD=your_password
+   DB_NAME=smart_starterkit
+
+   # JWT Secret
+   JWT_SECRET="your-super-secret-jwt-key-here"
+
+   # Server Configuration
+   PORT=3000
+   NODE_ENV=development
+   ```
+
+   **Client (.env)** - Tidak diperlukan untuk development default
+
+5. **Setup database schema dengan Drizzle migrations**
    ```bash
-   # Copy example env files
-   cp client/.env.example client/.env.local
-   cp server/.env.example server/.env.local
+   cd server
+
+   # Generate migration files (jika ada perubahan schema)
+   bun run db:generate
+
+   # Run migrations ke database
+   bun run db:migrate
+
+   # Atau push schema langsung ke database (untuk development)
+   bun run db:push
+
+   # Seed database dengan data awal
+   bun run seed
    ```
 
-4. **Start development servers**
+6. **Start development servers**
    ```bash
    # Jalankan semua services
    bun run dev
-   
+
    # Atau jalankan secara terpisah
    bun run dev:client  # Frontend di http://localhost:5173
    bun run dev:server  # Backend di http://localhost:3000
@@ -169,7 +193,7 @@ Struktur sekarang mencerminkan project Anda yang sebenarnya dengan semua folder 
 
 ### Root Level
 ```bash
-bun run dev              # Start semua services
+bun run dev              # Start semua services (client + server)
 bun run dev:client       # Start hanya frontend
 bun run dev:server       # Start hanya backend
 bun run build            # Build semua packages
@@ -177,7 +201,6 @@ bun run build:client     # Build hanya frontend
 bun run build:server     # Build hanya backend
 bun run lint             # Lint semua packages
 bun run type-check       # Type check semua packages
-bun run test             # Run tests
 ```
 
 ### Client Scripts
@@ -194,71 +217,31 @@ bun run lint             # Lint code
 cd server
 bun run dev              # Start Hono server dengan hot reload
 bun run build            # Build TypeScript
+
+# Database Commands
+bun run db:generate      # Generate migration files dari schema changes
+bun run db:migrate       # Run migration files ke database
+bun run db:push          # Push schema langsung ke database (development)
+bun run db:studio        # Buka Drizzle Studio untuk database management
+bun run seed             # Seed database dengan data awal
+bun run seed:reset       # Reset dan seed ulang database
 ```
 
-## 🔧 Konfigurasi
+## 🌐 API Documentation
 
-### Environment Variables
+Setelah menjalankan server, Anda dapat mengakses:
+- **Swagger UI**: `http://localhost:3000/api/docs`
+- **OpenAPI JSON**: `http://localhost:3000/api/openapi.json`
 
-**Client (.env.local)**
-```env
-API_URL=http://localhost:3000
-CLERK_PUBLISHABLE_KEY=your_clerk_key
-```
+### Available Endpoints
 
-**Server (.env.local)**
-```env
-PORT=3000
-CLERK_SECRET_KEY=your_clerk_secret
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=mydatabase
-```
+#### Authentication
+- `POST /api/auth/sign-up` - Register user baru
+- `POST /api/auth/sign-in` - Login user
+- `GET /api/auth/me` - Get current user info (requires Bearer token)
+- `POST /api/auth/sign-out` - Logout user (requires Bearer token)
 
-### Database Configuration
-Project menggunakan **MySQL** dengan connection pooling:
-- Database schema didefinisikan di `server/database/query.sql`
-- Connection pool dikonfigurasi di `server/utils/db.ts`
-- Support untuk soft delete dengan `deleted_at` column
-
-
-### Workspace Configuration
-Project ini menggunakan **Bun workspaces** untuk mengelola dependencies:
-- Dependencies diinstall otomatis untuk semua workspace
-- Shared code bisa diakses melalui `"shared": "workspace:*"`
-- Type definitions dibagikan melalui shared package
-
-## 🏗️ Development Workflow
-
-1. **Buat feature baru**
-   ```bash
-   # Buat branch baru
-   git checkout -b feature/nama-feature
-   
-   # Develop di workspace yang sesuai
-   cd client  # atau server
-   bun run dev
-   ```
-
-2. **Type checking**
-   ```bash
-   bun run type-check
-   ```
-
-3. **Linting**
-   ```bash
-   bun run lint
-   ```
-
-4. **Build & test**
-   ```bash
-   bun run build
-   bun run test
-   ```
-
-##  Package Management
+## 📦 Package Management
 
 ### Menambah Dependencies
 
@@ -286,44 +269,9 @@ Gunakan `workspace:*` untuk referensi antar workspace:
 {
   "dependencies": {
     "shared": "workspace:*",
-    "client": "workspace:*",
     "server": "workspace:*"
   }
 }
 ```
 
-## 🚀 Deployment
-
-### Frontend (Vercel/Netlify)
-```bash
-bun run build:client
-# Deploy dist/ folder
-```
-
-### Backend (Railway/Render)
-```bash
-bun run build:server
-# Deploy dengan start script
-```
-
-## 🤝 Contributing
-
-1. Fork repository
-2. Buat feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push ke branch (`git push origin feature/amazing-feature`)
-5. Buat Pull Request
-
-##  Acknowledgments
-
-- [Bun](https://bun.sh) - Fast JavaScript runtime
-- [Hono](https://hono.dev) - Modern web framework
-- [React](https://react.dev) - UI library
-- [Turbo](https://turbo.build) - Monorepo build system
-- [shadcn/ui](https://ui.shadcn.com) - Beautiful UI components
-
----
-
 **Happy Coding! 🎉**
-
-Jika ada pertanyaan atau butuh bantuan, silakan buat issue di repository ini.
