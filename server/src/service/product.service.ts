@@ -1,309 +1,283 @@
-import { db } from '../../utils/db'
+import { db } from '../db';
+import { products, categories, type ProductAPI, type CategoryAPI } from '../db/schema';
+import { eq, and, like, desc, asc, gte, lte, sql, count } from 'drizzle-orm';
 
-export interface Product {
-  id: number
-  name: string
-  description: string | null
-  price: number
-  stock: number
-  category: string | null
-  sku: string | null
-  status: 'active' | 'inactive'
-  created_at: string
-  updated_at: string | null
-}
+export type CreateProductData = {
+  name: string;
+  description?: string;
+  price: number;
+  stock: number;
+  categoryId?: number | null;
+  sku?: string;
+  status?: 'active' | 'inactive';
+};
 
-export interface CreateProductData {
-  name: string
-  description?: string
-  price: number
-  stock: number
-  category?: string
-  sku?: string
-  status?: 'active' | 'inactive'
-}
-
-export interface UpdateProductData {
-  name?: string
-  description?: string
-  price?: number
-  stock?: number
-  category?: string
-  sku?: string
-  status?: 'active' | 'inactive'
-}
+export type UpdateProductData = Partial<Omit<CreateProductData, 'status'>> & { status?: 'active' | 'inactive' };
 
 export interface ProductFilters {
-  search?: string
-  category?: string
-  status?: 'active' | 'inactive'
-  minPrice?: number
-  maxPrice?: number
-  minStock?: number
-  maxStock?: number
-  page?: number
-  limit?: number
-  sortBy?: string
-  sortOrder?: 'asc' | 'desc'
+  search?: string;
+  categoryId?: number;
+  status?: 'active' | 'inactive';
+  minPrice?: number;
+  maxPrice?: number;
+  minStock?: number;
+  maxStock?: number;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
-export interface PaginatedProducts {
-  data: Product[]
-  pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-    hasNext: boolean
-    hasPrev: boolean
-  }
+export interface ProductResult {
+  data: ProductAPI[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
 }
 
 export class ProductService {
-  async getProducts(filters?: ProductFilters): Promise<Product[]> {
+  private async enrichProductsWithCategories(productsList: any[]): Promise<ProductAPI[]> {
+    const categoryIds = [...new Set(productsList.map(p => p.categoryId).filter(Boolean))];
+    const categoriesMap = new Map<number, CategoryAPI>();
+
+    if (categoryIds.length > 0) {
+      const categoryResults = await db.select().from(categories).where(eq(categories.id, categoryIds[0]));
+
+      // Get all categories at once
+      const allCategories = await db.select().from(categories);
+      (allCategories as any[]).forEach(cat => {
+        if (categoryIds.includes(cat.id)) {
+          categoriesMap.set(cat.id, {
+            ...cat,
+            created_at: cat.created_at.toISOString(),
+            updated_at: cat.updated_at?.toISOString() || null,
+          });
+        }
+      });
+    }
+
+    return productsList.map(product => ({
+      ...product,
+      price: parseFloat(product.price),
+      created_at: product.created_at.toISOString(),
+      updated_at: product.updated_at?.toISOString() || null,
+      category: product.categoryId ? categoriesMap.get(product.categoryId) || null : null,
+    }));
+  }
+
+  async getProducts(filters?: ProductFilters): Promise<ProductResult> {
     try {
-      let query = 'SELECT id, name, description, price, stock, category, sku, status, created_at, updated_at FROM products WHERE deleted_at IS NULL'
-      const values: any[] = []
+      const conditions = [];
 
-      if (filters) {
-        const conditions: string[] = []
+      if (filters?.search) {
+        conditions.push(
+          sql`(${like(products.name, `%${filters.search}%`)} OR
+           ${like(products.description, `%${filters.search}%`)} OR
+           ${like(products.sku, `%${filters.search}%`)})`
+        );
+      }
 
-        if (filters.search) {
-          conditions.push('(name LIKE ? OR description LIKE ? OR sku LIKE ?)')
-          const searchTerm = `%${filters.search}%`
-          values.push(searchTerm, searchTerm, searchTerm)
-        }
+      if (filters?.categoryId) {
+        conditions.push(eq(products.categoryId, filters.categoryId));
+      }
 
-        if (filters.category) {
-          conditions.push('category = ?')
-          values.push(filters.category)
-        }
+      if (filters?.status) {
+        conditions.push(eq(products.status, filters.status));
+      }
 
-        if (filters.status) {
-          conditions.push('status = ?')
-          values.push(filters.status)
-        }
+      if (filters?.minPrice !== undefined) {
+        conditions.push(gte(products.price, filters.minPrice.toString()));
+      }
 
-        if (filters.minPrice !== undefined) {
-          conditions.push('price >= ?')
-          values.push(filters.minPrice)
-        }
+      if (filters?.maxPrice !== undefined) {
+        conditions.push(lte(products.price, filters.maxPrice.toString()));
+      }
 
-        if (filters.maxPrice !== undefined) {
-          conditions.push('price <= ?')
-          values.push(filters.maxPrice)
-        }
+      if (filters?.minStock !== undefined) {
+        conditions.push(gte(products.stock, filters.minStock));
+      }
 
-        if (filters.minStock !== undefined) {
-          conditions.push('stock >= ?')
-          values.push(filters.minStock)
-        }
+      if (filters?.maxStock !== undefined) {
+        conditions.push(lte(products.stock, filters.maxStock));
+      }
 
-        if (filters.maxStock !== undefined) {
-          conditions.push('stock <= ?')
-          values.push(filters.maxStock)
-        }
+      // Check if pagination is requested
+      const page = Math.max(1, filters?.page || 1);
+      const limit = Math.max(1, Math.min(100, filters?.limit || 10));
+      const offset = (page - 1) * limit;
+      const isPaginated = filters?.page !== undefined || filters?.limit !== undefined;
 
+      if (isPaginated) {
+        // Get total count
+        const countQuery = db.select({ total: count() }).from(products);
         if (conditions.length > 0) {
-          query += ' AND ' + conditions.join(' AND ')
+          countQuery.where(and(...conditions));
         }
-      }
+        const countResult = await countQuery;
+        const total = countResult[0]?.total || 0;
 
-      query += ' ORDER BY created_at DESC'
-
-      const [rows] = await db.execute(query, values)
-
-      return rows as Product[]
-    } catch (error) {
-      console.error('Error getting products:', error)
-      throw new Error('Failed to retrieve products')
-    }
-  }
-
-  async getPaginatedProducts(filters?: ProductFilters): Promise<PaginatedProducts> {
-    try {
-      const page = Math.max(1, filters?.page || 1)
-      const limit = Math.max(1, Math.min(100, filters?.limit || 10))
-      const offset = (page - 1) * limit
-
-      // Build WHERE conditions
-      let whereClause = 'WHERE deleted_at IS NULL'
-      const values: any[] = []
-
-      if (filters) {
-        const conditions: string[] = []
-
-        if (filters.search) {
-          conditions.push('(name LIKE ? OR description LIKE ? OR sku LIKE ?)')
-          const searchTerm = `%${filters.search}%`
-          values.push(searchTerm, searchTerm, searchTerm)
-        }
-
-        if (filters.category) {
-          conditions.push('category = ?')
-          values.push(filters.category)
-        }
-
-        if (filters.status) {
-          conditions.push('status = ?')
-          values.push(filters.status)
+        // Build ORDER BY clause
+        let orderBy = desc(products.created_at);
+        if (filters?.sortBy) {
+          const validSortColumns = ['id', 'name', 'price', 'stock', 'status', 'created_at', 'updated_at', 'categoryId', 'sku'];
+          if (validSortColumns.includes(filters.sortBy)) {
+            switch (filters.sortBy) {
+              case 'id':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.id) : desc(products.id);
+                break;
+              case 'name':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.name) : desc(products.name);
+                break;
+              case 'price':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.price) : desc(products.price);
+                break;
+              case 'stock':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.stock) : desc(products.stock);
+                break;
+              case 'status':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.status) : desc(products.status);
+                break;
+              case 'created_at':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.created_at) : desc(products.created_at);
+                break;
+              case 'updated_at':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.updated_at) : desc(products.updated_at);
+                break;
+              case 'categoryId':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.categoryId) : desc(products.categoryId);
+                break;
+              case 'sku':
+                orderBy = filters.sortOrder === 'asc' ? asc(products.sku) : desc(products.sku);
+                break;
+            }
+          }
         }
 
-        if (filters.minPrice !== undefined) {
-          conditions.push('price >= ?')
-          values.push(filters.minPrice)
-        }
-
-        if (filters.maxPrice !== undefined) {
-          conditions.push('price <= ?')
-          values.push(filters.maxPrice)
-        }
-
-        if (filters.minStock !== undefined) {
-          conditions.push('stock >= ?')
-          values.push(filters.minStock)
-        }
-
-        if (filters.maxStock !== undefined) {
-          conditions.push('stock <= ?')
-          values.push(filters.maxStock)
-        }
-
+        // Get paginated data
+        let query = db.select().from(products);
         if (conditions.length > 0) {
-          whereClause += ' AND ' + conditions.join(' AND ')
+          query.where(and(...conditions));
         }
-      }
+        const result = await query.orderBy(orderBy).limit(limit).offset(offset);
 
-      // Get total count
-      const countQuery = `SELECT COUNT(*) as total FROM products ${whereClause}`
-      const [countRows] = await db.execute(countQuery, values)
-      const total = (countRows as any[])[0].total
+        const enrichedProducts = await this.enrichProductsWithCategories(result);
+        const totalPages = Math.ceil(total / limit);
 
-      // Build ORDER BY clause
-      let orderByClause = 'ORDER BY created_at DESC'
-      if (filters.sortBy) {
-        const validSortColumns = ['id', 'name', 'price', 'stock', 'status', 'created_at', 'updated_at', 'category', 'sku']
-        const validSortOrder = filters.sortOrder === 'asc' ? 'ASC' : 'DESC'
-
-        if (validSortColumns.includes(filters.sortBy)) {
-          orderByClause = `ORDER BY ${filters.sortBy} ${validSortOrder}`
+        return {
+          data: enrichedProducts,
+          pagination: {
+            page,
+            limit,
+            total,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrev: page > 1,
+          },
+        };
+      } else {
+        // Get all data without pagination
+        let query = db.select().from(products);
+        if (conditions.length > 0) {
+          query.where(and(...conditions));
         }
-      }
+        const result = await query.orderBy(desc(products.created_at));
 
-      // Get paginated data
-      const dataQuery = `SELECT id, name, description, price, stock, category, sku, status, created_at, updated_at FROM products ${whereClause} ${orderByClause} LIMIT ${limit} OFFSET ${offset}`
-      const [rows] = await db.execute(dataQuery, values)
-
-      const totalPages = Math.ceil(total / limit)
-      const data = rows as Product[]
-
-      return {
-        data,
-        pagination: {
-          page,
-          limit,
-          total,
-          totalPages,
-          hasNext: page < totalPages,
-          hasPrev: page > 1,
-        },
+        const enrichedProducts = await this.enrichProductsWithCategories(result);
+        return {
+          data: enrichedProducts,
+        };
       }
     } catch (error) {
-      console.error('Error getting paginated products:', error)
-      throw new Error('Failed to retrieve paginated products')
+      console.error('Error getting products:', error);
+      throw new Error('Failed to retrieve products');
     }
   }
 
-  async getProductById(id: number): Promise<Product | null> {
+  async getProductById(id: number): Promise<ProductAPI | null> {
     try {
-      const [rows] = await db.execute(
-        'SELECT id, name, description, price, stock, category, sku, status, created_at, updated_at FROM products WHERE id = ? AND deleted_at IS NULL',
-        [id]
-      )
+      const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+      const rows = result as any[];
 
-      const products = rows as Product[]
-      const result = products.length > 0 ? products[0] : null
-      return result as Product | null
+      if (rows.length === 0) {
+        return null;
+      }
+
+      const enrichedProducts = await this.enrichProductsWithCategories([rows[0]]);
+      return enrichedProducts[0] || null;
     } catch (error) {
-      console.error('Error getting product by id:', error)
-      throw new Error('Failed to retrieve product')
+      console.error('Error getting product by id:', error);
+      throw new Error('Failed to retrieve product');
     }
   }
 
-  async createProduct(data: CreateProductData): Promise<Product> {
+  async createProduct(data: CreateProductData): Promise<ProductAPI> {
     try {
-      const { name, description, price, stock, category, sku, status = 'active' } = data
+      const { name, description, price, stock, categoryId, sku, status = 'active' } = data;
 
-      const [result] = await db.execute(
-        'INSERT INTO products (name, description, price, stock, category, sku, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [name, description, price, stock, category, sku, status]
-      )
+      const insertData = {
+        name,
+        description: description || null,
+        price: price.toString(),
+        stock,
+        categoryId: categoryId || null,
+        sku: sku || null,
+        status,
+      };
 
-      const insertResult = result as any
-      const newProduct = await this.getProductById(insertResult.insertId)
+      const result = await db.insert(products).values(insertData);
+      const insertId = Number(result[0].insertId);
 
+      const newProduct = await this.getProductById(insertId);
       if (!newProduct) {
-        throw new Error('Failed to retrieve created product')
+        throw new Error('Failed to retrieve created product');
       }
 
-      return newProduct
+      return newProduct;
     } catch (error: any) {
-      console.error('Error creating product:', error)
+      console.error('Error creating product:', error);
 
-      // Handle specific database errors
       if (error.code === 'ER_DUP_ENTRY') {
         if (error.message?.includes('sku')) {
-          throw new Error('Product with this SKU already exists')
+          throw new Error('Product with this SKU already exists');
         }
-        throw new Error('Product already exists')
+        throw new Error('Product already exists');
       }
 
-      throw new Error('Failed to create product')
+      throw new Error('Failed to create product');
     }
   }
 
-  async updateProduct(id: number, data: UpdateProductData): Promise<Product | null> {
+  async updateProduct(id: number, data: UpdateProductData): Promise<ProductAPI | null> {
     try {
-      const fields: string[] = []
-      const values: any[] = []
-
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined) {
-          fields.push(`${key} = ?`)
-          values.push(value)
-        }
-      })
-
-      if (fields.length === 0) {
-        return await this.getProductById(id)
+      const updateData: any = { ...data };
+      if (data.price !== undefined) {
+        updateData.price = data.price.toString();
       }
 
-      values.push(id)
+      const result = await db
+        .update(products)
+        .set(updateData)
+        .where(eq(products.id, id));
 
-      await db.execute(
-        `UPDATE products SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL`,
-        values
-      )
-
-      return await this.getProductById(id)
+      return await this.getProductById(id);
     } catch (error) {
-      console.error('Error updating product:', error)
-      throw new Error('Failed to update product')
+      console.error('Error updating product:', error);
+      throw new Error('Failed to update product');
     }
   }
 
   async deleteProduct(id: number): Promise<boolean> {
     try {
-      const [result] = await db.execute(
-        'UPDATE products SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL',
-        [id]
-      )
-      
-      const updateResult = result as any
-      return updateResult.affectedRows > 0
+      const result = await db.delete(products).where(eq(products.id, id));
+      return result.length > 0;
     } catch (error) {
-      console.error('Error deleting product:', error)
-      throw new Error('Failed to delete product')
+      console.error('Error deleting product:', error);
+      throw new Error('Failed to delete product');
     }
   }
 }

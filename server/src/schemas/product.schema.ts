@@ -1,16 +1,26 @@
 import { z } from '@hono/zod-openapi'
 
+const Category = z.object({
+  id: z.number().openapi({ example: 1 }),
+  name: z.string().openapi({ example: 'Electronics' }),
+  description: z.string().nullable().openapi({ example: 'Electronic devices and accessories' }),
+  status: z.enum(['active', 'inactive']).openapi({ example: 'active' }),
+  created_at: z.string().openapi({ example: '2024-01-01T00:00:00.000Z' }),
+  updated_at: z.string().nullable().openapi({ example: '2024-01-01T00:00:00.000Z' }),
+}).openapi('Category')
+
 export const Product = z.object({
   id: z.number().openapi({ example: 1 }),
   name: z.string().openapi({ example: 'Laptop Gaming ASUS' }),
   description: z.string().nullable().openapi({ example: 'High performance gaming laptop with RTX 4060' }),
   price: z.number().openapi({ example: 15000000.00 }),
   stock: z.number().openapi({ example: 25 }),
-  category: z.string().nullable().openapi({ example: 'Electronics' }),
+  categoryId: z.number().nullable().openapi({ example: 1 }),
   sku: z.string().nullable().openapi({ example: 'ASUS-GAM-001' }),
   status: z.enum(['active', 'inactive']).openapi({ example: 'active' }),
   created_at: z.string().openapi({ example: '2024-01-01T00:00:00.000Z' }),
   updated_at: z.string().nullable().openapi({ example: '2024-01-01T00:00:00.000Z' }),
+  category: Category.nullable().openapi({ example: null }),
 }).openapi('Product')
 
 export const CreateProduct = z.object({
@@ -18,7 +28,7 @@ export const CreateProduct = z.object({
   description: z.string().optional().openapi({ example: 'High performance gaming laptop with RTX 4060' }),
   price: z.number().positive().openapi({ example: 15000000.00 }),
   stock: z.number().min(0).openapi({ example: 25 }),
-  category: z.string().optional().openapi({ example: 'Electronics' }),
+  categoryId: z.number().optional().openapi({ example: 1 }),
   sku: z.string().optional().openapi({ example: 'ASUS-GAM-001' }),
   status: z.enum(['active', 'inactive']).default('active').openapi({ example: 'active' }),
 }).openapi('CreateProduct')
@@ -28,7 +38,7 @@ export const UpdateProduct = z.object({
   description: z.string().optional().openapi({ example: 'High performance gaming laptop with RTX 4060' }),
   price: z.number().positive().optional().openapi({ example: 15000000.00 }),
   stock: z.number().min(0).optional().openapi({ example: 25 }),
-  category: z.string().optional().openapi({ example: 'Electronics' }),
+  categoryId: z.number().optional().openapi({ example: 1 }),
   sku: z.string().optional().openapi({ example: 'ASUS-GAM-001' }),
   status: z.enum(['active', 'inactive']).optional().openapi({ example: 'active' }),
 }).openapi('UpdateProduct')

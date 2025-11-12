@@ -11,32 +11,5 @@ export interface Product {
   updated_at: string | null;
 }
 
-export interface CreateProductInput {
-  name: string;
-  description?: string;
-  price: number;
-  stock: number;
-  category?: string;
-  sku?: string;
-  status?: "active" | "inactive";
-}
-
-export interface UpdateProductInput {
-  name?: string;
-  description?: string;
-  price?: number;
-  stock?: number;
-  category?: string;
-  sku?: string;
-  status?: "active" | "inactive";
-}
-
-export interface ProductFilters {
-  search?: string;
-  category?: string;
-  status?: "active" | "inactive";
-  minPrice?: number;
-  maxPrice?: number;
-  minStock?: number;
-  maxStock?: number;
-}
+// Re-export from validation to avoid conflicts
+export type { CreateProductInput, UpdateProductInput, ProductFilters } from "../validation/products.validation";

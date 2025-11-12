@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1762922168338,
+      "tag": "0000_ordinary_la_nuit",
+      "breakpoints": true
+    }
+  ]
+}

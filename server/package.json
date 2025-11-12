@@ -5,15 +5,20 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "bun --watch run src/index.ts"
+    "dev": "bun --watch run src/index.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "bun run src/db/seed.ts"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.5.2",
     "@hono/zod-openapi": "^1.1.0",
-    "@prisma/client": "^6.15.0",
+    "drizzle-kit": "^0.30.4",
+    "drizzle-orm": "^0.44.7",
     "hono": "^4.9.7",
     "mysql2": "^3.11.3",
-    "prisma": "^6.15.0",
     "shared": "workspace:*",
     "winston": "^3.17.0",
     "zod": "^4.1.8"

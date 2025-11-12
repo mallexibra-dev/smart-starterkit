@@ -1,7 +1,8 @@
 import type { Context } from 'hono'
 import { ProductService } from '../service/product.service'
+import { ResponseHelper, type PaginatedData } from '../utils/response.helper'
 import type { CreateProductData, UpdateProductData, ProductFilters } from '../service/product.service'
-import type { PaginatedProducts } from '../service/product.service'
+import type { ProductResult } from '../service/product.service'
 
 export class ProductController {
   private productService: ProductService
@@ -15,173 +16,121 @@ export class ProductController {
       const queryParams = c.req.query()
       const filters: ProductFilters = {}
 
-      if (queryParams.search) filters.search = queryParams.search
-      if (queryParams.category) filters.category = queryParams.category
-      if (queryParams.status) filters.status = queryParams.status as 'active' | 'inactive'
-      if (queryParams.minPrice) filters.minPrice = parseFloat(queryParams.minPrice)
-      if (queryParams.maxPrice) filters.maxPrice = parseFloat(queryParams.maxPrice)
-      if (queryParams.minStock) filters.minStock = parseInt(queryParams.minStock)
-      if (queryParams.maxStock) filters.maxStock = parseInt(queryParams.maxStock)
-      if (queryParams.page) filters.page = parseInt(queryParams.page)
-      if (queryParams.limit) filters.limit = parseInt(queryParams.limit)
-      if (queryParams.sortBy) filters.sortBy = queryParams.sortBy
-      if (queryParams.sortOrder) filters.sortOrder = queryParams.sortOrder as 'asc' | 'desc'
+      // Use validated query params if available, otherwise use raw params
+      const validatedParams = (c as any).get('validatedQueryParams');
 
-      // Check if pagination is requested
-      const isPaginated = filters.page !== undefined || filters.limit !== undefined
+      filters.search = validatedParams?.search || queryParams.search
+      filters.categoryId = validatedParams?.categoryId || (queryParams.categoryId ? parseInt(queryParams.categoryId) : undefined)
+      filters.status = validatedParams?.status || queryParams.status
+      filters.minPrice = validatedParams?.minPrice || (queryParams.minPrice ? parseFloat(queryParams.minPrice) : undefined)
+      filters.maxPrice = validatedParams?.maxPrice || (queryParams.maxPrice ? parseFloat(queryParams.maxPrice) : undefined)
+      filters.minStock = validatedParams?.minStock || (queryParams.minStock ? parseInt(queryParams.minStock) : undefined)
+      filters.maxStock = validatedParams?.maxStock || (queryParams.maxStock ? parseInt(queryParams.maxStock) : undefined)
+      filters.page = validatedParams?.page || (queryParams.page ? parseInt(queryParams.page) : undefined)
+      filters.limit = validatedParams?.limit || (queryParams.limit ? parseInt(queryParams.limit) : undefined)
+      filters.sortBy = validatedParams?.sortBy || queryParams.sortBy
+      filters.sortOrder = validatedParams?.sortOrder || queryParams.sortOrder
 
-      if (isPaginated) {
-        const result: PaginatedProducts = await this.productService.getPaginatedProducts(filters)
+      const result: ProductResult = await this.productService.getProducts(filters)
 
-        return c.json({
-          success: true,
-          message: 'Products retrieved successfully',
+      // Check if result has pagination, if so format it as PaginatedData
+      if (result.pagination) {
+        const responseData: PaginatedData<typeof result.data[0]> = {
           data: result.data,
           pagination: result.pagination,
-        }, 200)
+        }
+        return ResponseHelper.success(c, 'Products retrieved successfully', responseData)
       } else {
-        const products = await this.productService.getProducts(filters)
-
-        return c.json({
-          success: true,
-          message: 'Products retrieved successfully',
-          data: products,
-        }, 200)
+        return ResponseHelper.success(c, 'Products retrieved successfully', result.data)
       }
     } catch (error) {
       console.error('Error getting products:', error)
-
-      return c.json({
-        success: false,
-        message: 'Failed to retrieve products',
-      }, 500)
+      return ResponseHelper.serverError(c, 'Failed to retrieve products')
     }
   }
 
   async getProductById(c: Context) {
     try {
       const id = parseInt(c.req.param('id'))
-      
+
       if (isNaN(id)) {
-        return c.json({
-          success: false,
-          message: 'Invalid product ID',
-        }, 400)
+        return ResponseHelper.badRequest(c, 'Invalid product ID')
       }
 
       const product = await this.productService.getProductById(id)
-      
+
       if (!product) {
-        return c.json({
-          success: false,
-          message: 'Product not found',
-        }, 404)
+        return ResponseHelper.notFound(c, 'Product')
       }
-      
-      return c.json({
-        success: true,
-        message: 'Product retrieved successfully',
-        data: product,
-      }, 200)
+
+      return ResponseHelper.success(c, 'Product retrieved successfully', product)
     } catch (error) {
       console.error('Error getting product by id:', error)
-      
-      return c.json({
-        success: false,
-        message: 'Failed to retrieve product',
-      }, 500)
+      return ResponseHelper.serverError(c, 'Failed to retrieve product')
     }
   }
 
   async createProduct(c: Context) {
     try {
       const body = await c.req.json() as CreateProductData
-      
+
       const product = await this.productService.createProduct(body)
-      
-      return c.json({
-        success: true,
-        message: 'Product created successfully',
-        data: product,
-      }, 201)
-    } catch (error) {
+
+      return ResponseHelper.created(c, 'Product created successfully', product)
+    } catch (error: any) {
       console.error('Error creating product:', error)
-      
-      return c.json({
-        success: false,
-        message: 'Failed to create product',
-      }, 500)
+
+      let message = 'Failed to create product'
+      if (error.message.includes('already exists')) {
+        message = error.message
+        return ResponseHelper.conflict(c, message)
+      }
+
+      return ResponseHelper.serverError(c, message)
     }
   }
 
   async updateProduct(c: Context) {
     try {
       const id = parseInt(c.req.param('id'))
-      
+
       if (isNaN(id)) {
-        return c.json({
-          success: false,
-          message: 'Invalid product ID',
-        }, 400)
+        return ResponseHelper.badRequest(c, 'Invalid product ID')
       }
 
       const body = await c.req.json() as UpdateProductData
-      
+
       const product = await this.productService.updateProduct(id, body)
-      
+
       if (!product) {
-        return c.json({
-          success: false,
-          message: 'Product not found',
-        }, 404)
+        return ResponseHelper.notFound(c, 'Product')
       }
-      
-      return c.json({
-        success: true,
-        message: 'Product updated successfully',
-        data: product,
-      }, 200)
+
+      return ResponseHelper.success(c, 'Product updated successfully', product)
     } catch (error) {
       console.error('Error updating product:', error)
-      
-      return c.json({
-        success: false,
-        message: 'Failed to update product',
-      }, 500)
+      return ResponseHelper.serverError(c, 'Failed to update product')
     }
   }
 
   async deleteProduct(c: Context) {
     try {
       const id = parseInt(c.req.param('id'))
-      
+
       if (isNaN(id)) {
-        return c.json({
-          success: false,
-          message: 'Invalid product ID',
-        }, 400)
+        return ResponseHelper.badRequest(c, 'Invalid product ID')
       }
 
       const deleted = await this.productService.deleteProduct(id)
-      
+
       if (!deleted) {
-        return c.json({
-          success: false,
-          message: 'Product not found',
-        }, 404)
+        return ResponseHelper.notFound(c, 'Product')
       }
-      
-      return c.json({
-        success: true,
-        message: 'Product deleted successfully',
-      }, 200)
+
+      return ResponseHelper.success(c, 'Product deleted successfully')
     } catch (error) {
       console.error('Error deleting product:', error)
-      
-      return c.json({
-        success: false,
-        message: 'Failed to delete product',
-      }, 500)
+      return ResponseHelper.serverError(c, 'Failed to delete product')
     }
   }
 }
