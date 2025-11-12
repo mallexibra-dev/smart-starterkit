@@ -1,17 +1,15 @@
 import { api } from "@/lib/axios";
-import type { LoginInput } from "shared/src/validation/auth.validation";
+import type { LoginInput, RegisterInput } from "shared/src/validation/auth.validation";
 
 export type AuthPayload = {
   user: {
     id: number;
     name: string;
-    username: string;
-    email: string | null;
+    email: string;
+    emailVerified: boolean;
+    createdAt: string;
   };
-  access_token: string;
-  access_expires_at: string;
-  refresh_token: string;
-  refresh_expires_at: string;
+  token?: string | null;
 };
 
 export type AuthResponse = {
@@ -21,6 +19,21 @@ export type AuthResponse = {
 };
 
 export async function login(input: LoginInput): Promise<AuthResponse> {
-  const { data } = await api.post<AuthResponse>("/auth/login", input);
+  const { data } = await api.post<AuthResponse>("/auth/sign-in", input);
+  return data;
+}
+
+export async function register(input: RegisterInput): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/auth/sign-up", input);
+  return data;
+}
+
+export async function logout(): Promise<AuthResponse> {
+  const { data } = await api.post<AuthResponse>("/auth/sign-out");
+  return data;
+}
+
+export async function getCurrentUser(): Promise<AuthResponse> {
+  const { data } = await api.get<AuthResponse>("/auth/me");
   return data;
 }

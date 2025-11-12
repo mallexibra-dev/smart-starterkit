@@ -2,17 +2,37 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import { cors } from 'hono/cors'
 import { swaggerUI } from '@hono/swagger-ui'
 import routes from './route'
-import { requestLogger } from './middlewares/logs.middleware'
+import {
+  requestLogger
+} from './middlewares/logs.middleware'
+import {
+  errorHandler,
+  notFoundHandler
+} from './middlewares/error.middleware'
+import {
+  securityHeaders
+} from './middlewares/security.middleware'
+import {
+  apiRateLimit
+} from './middlewares/rate-limit.middleware'
 
 const app = new OpenAPIHono()
 
-app.use(cors({
+// Global middleware (applied to all routes)
+app.use('*', securityHeaders())
+app.use('*', errorHandler())
+app.use('*', requestLogger)
+
+// CORS configuration
+app.use('*', cors({
   origin: 'http://localhost:5173',
   credentials: true,
   allowMethods: ['GET','POST','PUT','DELETE','OPTIONS'],
-  allowHeaders: ['Content-Type', 'Authorization']
+  allowHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }))
-app.use('*', requestLogger)
+
+// Rate limiting for API routes
+app.use('/api/*', apiRateLimit())
 
 app.openAPIRegistry.registerComponent('securitySchemes', 'bearerAuth', {
   type: 'http',
@@ -39,6 +59,9 @@ app.doc('/api/openapi.json', {
 app.get('/api/docs', swaggerUI({ url: '/api/openapi.json', persistAuthorization: true }))
 
 app.route('/api', routes)
+
+// Handle 404s for API routes
+app.use('/api/*', notFoundHandler())
 
 export default app
 

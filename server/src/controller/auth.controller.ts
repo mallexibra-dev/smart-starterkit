@@ -1,268 +1,143 @@
-import type { Context } from "hono";
-import type { ApiResponse } from "shared/dist";
-import { AuthService } from "../service/auth.service";
-import { getCookie, setCookie, deleteCookie } from "hono/cookie";
+import { setCookie } from 'hono/cookie';
+import { UserService } from '../service/auth.service';
+import { AuthService } from '../lib/auth';
 
 export class AuthController {
-  private service: AuthService;
+  static async signUp(c: any) {
+    try {
+      const { name, email, password } = c.req.valid("json");
 
-  constructor() {
-    this.service = new AuthService();
+      const user = await UserService.createUser({ name, email, password });
+      const token = AuthService.generateToken(user);
+
+      setCookie(c, 'token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        path: '/',
+      });
+
+      return c.json({
+        success: true,
+        message: "Registration successful",
+        data: {
+          user,
+        },
+      });
+    } catch (error: any) {
+      console.error('Sign-up error:', error);
+      const userMessage = getUserFriendlyError(error);
+      return c.json({
+        success: false,
+        message: userMessage,
+      }, 400);
+    }
   }
 
-  async register(c: Context) {
-    const body = await c.req.json();
-    const { name, username, email, password } = body as {
-      name: string;
-      username: string;
-      email?: string;
-      password: string;
-    };
+  static async signIn(c: any) {
+    try {
+      const { email, password } = c.req.valid("json");
 
-    const exist = await this.service.findUserByUsernameOrEmail(username);
-    if (exist) {
-      const response: ApiResponse = {
+      const user = await UserService.authenticateUser({ email, password });
+      const token = AuthService.generateToken(user);
+
+      setCookie(c, 'token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        path: '/',
+      });
+
+      return c.json({
+        success: true,
+        message: "Login successful",
+        data: {
+          user,
+        },
+      });
+    } catch (error: any) {
+      console.error('Sign-in error:', error);
+      return c.json({
         success: false,
-        message: "Username sudah dipakai",
-      };
-      return c.json(response, 409);
+        message: "Authentication failed. Please try again.",
+      }, 401);
     }
+  }
 
-    if (email) {
-      const existEmail = await this.service.findUserByUsernameOrEmail(email);
-      if (existEmail) {
-        const response: ApiResponse = {
+  static async getCurrentUser(c: any) {
+    try {
+      const token = AuthService.extractTokenFromCookie(c.req.header('cookie'));
+
+      if (!token) {
+        return c.json({
           success: false,
-          message: "Email sudah dipakai",
-        };
-        return c.json(response, 409);
+          message: "No token provided",
+        }, 401);
       }
-    }
 
-    const user = await this.service.createUser({
-      name,
-      username,
-      email: email ?? null,
-      password,
-    });
-    const session = await this.service.createSession(user.id);
+      const payload = AuthService.verifyToken(token);
 
-    this.setAuthCookies(c, session.id, session.refresh_token, String(session.expires_at), String(session.refresh_expires_at));
+      if (!payload) {
+        return c.json({
+          success: false,
+          message: "Invalid token",
+        }, 401);
+      }
 
-    const response: ApiResponse & { data: any } = {
-      success: true,
-      message: "Registrasi berhasil",
-      data: {
-        user: {
-          id: user.id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
+      const user = await UserService.getUserById(payload.id);
+
+      if (!user) {
+        return c.json({
+          success: false,
+          message: "User not found",
+        }, 404);
+      }
+
+      return c.json({
+        success: true,
+        data: {
+          user,
         },
-        access_token: session.id,
-        access_expires_at: session.expires_at,
-        refresh_token: session.refresh_token,
-        refresh_expires_at: session.refresh_expires_at,
-      },
-    };
-    return c.json(response, 201);
-  }
-
-  async login(c: Context) {
-    const body = await c.req.json();
-    const { identifier, password } = body as {
-      identifier: string;
-      password: string;
-    };
-
-    const user = await this.service.findUserByUsernameOrEmail(identifier);
-    if (!user) {
-      const response: ApiResponse = {
+      });
+    } catch (error: any) {
+      console.error('Get user error:', error);
+      return c.json({
         success: false,
-        message: "User tidak ditemukan",
-      };
-      return c.json(response, 401);
+        message: "Failed to get user",
+      }, 500);
     }
-
-    const ok = await this.service.verifyPassword(password, user.password);
-    if (!ok) {
-      const response: ApiResponse = {
-        success: false,
-        message: "Username/Email atau Password salah",
-      };
-      return c.json(response, 401);
-    }
-
-    const session = await this.service.createSession(user.id);
-    console.log(session);
-
-    this.setAuthCookies(c, session.id, session.refresh_token, String(session.expires_at), String(session.refresh_expires_at));
-
-    const response: ApiResponse & { data: any } = {
-      success: true,
-      message: "Login berhasil",
-      data: {
-        user: {
-          id: user.id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-        },
-        access_token: session.id,
-        access_expires_at: session.expires_at,
-        refresh_token: session.refresh_token,
-        refresh_expires_at: session.refresh_expires_at,
-      },
-    };
-    return c.json(response, 200);
   }
 
-  async me(c: Context) {
-    const token = this.getToken(c);
-    if (!token) {
-      const response: ApiResponse = { success: false, message: "Unauthorized" };
-      return c.json(response, 401);
-    }
-
-    const session = await this.service.getSessionById(token);
-    if (!session || this.service.isExpired(session.expires_at)) {
-      const response: ApiResponse = {
-        success: false,
-        message: "Token kedaluwarsa",
-      };
-      return c.json(response, 401);
-    }
-
-    const user = await this.service.findUserById(session.user_id);
-    if (!user) {
-      const response: ApiResponse = {
-        success: false,
-        message: "User tidak ditemukan",
-      };
-      return c.json(response, 404);
-    }
-
-    const response: ApiResponse & { data: any } = {
-      success: true,
-      message: "OK",
-      data: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-      },
-    };
-    return c.json(response, 200);
-  }
-
-  async refresh(c: Context) {
-    const body = await c.req.json().catch(() => ({}));
-    const { refresh_token } = body as { refresh_token?: string };
-    const token = refresh_token || this.getRefreshToken(c);
-
-    if (!token) {
-      const response: ApiResponse = {
-        success: false,
-        message: "Refresh token tidak ada",
-      };
-      return c.json(response, 400);
-    }
-
-    const session = await this.service.getSessionByRefreshToken(token);
-    if (!session || this.service.isExpired(session.refresh_expires_at)) {
-      const response: ApiResponse = {
-        success: false,
-        message: "Refresh token tidak valid",
-      };
-      return c.json(response, 401);
-    }
-
-    const rotated = await this.service.rotateSession(token);
-    if (!rotated) {
-      const response: ApiResponse = {
-        success: false,
-        message: "Gagal membuat sesi baru",
-      };
-      return c.json(response, 500);
-    }
-
-    this.setAuthCookies(c, rotated.id, rotated.refresh_token, String(rotated.expires_at), String(rotated.refresh_expires_at));
-
-    const response: ApiResponse & { data: any } = {
-      success: true,
-      message: "Token diperbarui",
-      data: {
-        access_token: rotated.id,
-        access_expires_at: rotated.expires_at,
-        refresh_token: rotated.refresh_token,
-        refresh_expires_at: rotated.refresh_expires_at,
-      },
-    };
-    return c.json(response, 200);
-  }
-
-  async logout(c: Context) {
-    const token = this.getToken(c);
-    if (token) {
-      await this.service.deleteSession(token);
-    }
-    this.clearAuthCookies(c);
-    const response: ApiResponse = { success: true, message: "Logout berhasil" };
-    return c.json(response, 200);
-  }
-
-  private getToken(c: Context): string | null {
-    const cookieToken = getCookie(c, 'access_token') || null;
-    if (cookieToken) return cookieToken;
-    return this.getBearer(c);
-  }
-
-  private getRefreshToken(c: Context): string | null {
-    const cookieToken = getCookie(c, 'refresh_token') || null;
-    if (cookieToken) return cookieToken;
-    return this.getBearer(c);
-  }
-
-  private getBearer(c: Context): string | null {
-    const auth = c.req.header("authorization") || c.req.header("Authorization");
-    if (!auth) return null;
-    const parts = auth.split(" ");
-    if (parts.length !== 2) return null;
-    if (parts[0] !== "Bearer") return null;
-    return parts[1] ?? null;
-  }
-
-  private setAuthCookies(
-    c: Context,
-    accessToken: string,
-    refreshToken: string,
-    accessExpiresAt: string,
-    refreshExpiresAt: string
-  ) {
-    const accessMaxAge = Math.max(0, Math.floor((new Date(accessExpiresAt).getTime() - Date.now()) / 1000));
-    const refreshMaxAge = Math.max(0, Math.floor((new Date(refreshExpiresAt).getTime() - Date.now()) / 1000));
-
-    setCookie(c, 'access_token', accessToken, {
+  static async signOut(c: any) {
+    setCookie(c, 'token', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
+      maxAge: 0,
       path: '/',
-      maxAge: accessMaxAge || 60 * 60,
     });
 
-    console.log("cookie ", accessToken);
-
-    setCookie(c, 'refresh_token', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: refreshMaxAge || 60 * 60 * 24 * 7,
+    return c.json({
+      success: true,
+      message: "Logout successful",
     });
   }
+}
 
-  private clearAuthCookies(c: Context) {
-    deleteCookie(c, 'access_token', { path: '/' });
-    deleteCookie(c, 'refresh_token', { path: '/' });
+function getUserFriendlyError(error: any): string {
+  if (error.message?.includes('Duplicate entry') || error.message?.includes('UNIQUE constraint failed')) {
+    return 'Email already registered. Please use another email.';
   }
+
+  if (error.message?.includes('Invalid credentials') || error.message?.includes('password')) {
+    return 'Invalid email or password';
+  }
+
+  if (error.message?.includes('User not found')) {
+    return 'No account found with this email';
+  }
+
+  return 'Authentication failed. Please try again.';
 }

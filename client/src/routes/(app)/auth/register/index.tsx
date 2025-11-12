@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { FormLogin } from "./-components/FormLogin";
+import { FormRegister } from "./-components/FormRegister";
 import {
   Card,
   CardContent,
@@ -10,11 +10,11 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 
-export const Route = createFileRoute("/(app)/auth/login/")({
-  component: LoginPage,
+export const Route = createFileRoute("/(app)/auth/register/")({
+  component: RegisterPage,
 });
 
-function LoginPage() {
+function RegisterPage() {
   const navigate = useNavigate();
   const { isAuthenticated, isLoading } = useAuth();
 
@@ -33,7 +33,7 @@ function LoginPage() {
   }
 
   if (isAuthenticated) {
-    return null;
+    return null; // Will redirect due to useEffect
   }
 
   return (
@@ -41,11 +41,11 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <Card className="w-full shadow-md">
           <CardHeader>
-            <CardTitle className="text-2xl">Sign In</CardTitle>
-            <CardDescription>Please sign in to continue</CardDescription>
+            <CardTitle className="text-2xl">Sign Up</CardTitle>
+            <CardDescription>Create your account to get started</CardDescription>
           </CardHeader>
           <CardContent>
-            <FormLogin onSuccess={() => navigate({ to: "/" })} />
+            <FormRegister onSuccess={() => navigate({ to: "/" })} />
           </CardContent>
         </Card>
       </div>

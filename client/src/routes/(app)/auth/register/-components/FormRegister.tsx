@@ -2,27 +2,27 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Link } from "@tanstack/react-router"
-import { loginSchema, type LoginInput } from "shared/src/validation/auth.validation"
+import { registerSchema, type RegisterInput } from "shared/src/validation/auth.validation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { useLogin } from "@/hooks/useAuth"
+import { useRegister } from "@/hooks/useAuth"
 import { Eye, EyeOff } from "lucide-react"
 
 type Props = {
     onSuccess?: () => void
 }
 
-export const FormLogin = ({ onSuccess }: Props) => {
-    const form = useForm<LoginInput>({
-        resolver: zodResolver(loginSchema),
-        defaultValues: { email: "", password: "" }
+export const FormRegister = ({ onSuccess }: Props) => {
+    const form = useForm<RegisterInput>({
+        resolver: zodResolver(registerSchema),
+        defaultValues: { name: "", email: "", password: "" }
     })
     const [serverError, setServerError] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState(false)
 
-    const mutation = useLogin()
+    const mutation = useRegister()
 
-    async function onSubmit(values: LoginInput) {
+    async function onSubmit(values: RegisterInput) {
         setServerError(null)
         mutation.mutate(values, {
             onSuccess: () => {
@@ -37,6 +37,25 @@ export const FormLogin = ({ onSuccess }: Props) => {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                                <input
+                                    {...field}
+                                    type="text"
+                                    placeholder="Enter your name"
+                                    className="w-full rounded-md border px-3 py-2 outline-none"
+                                />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
                 <FormField
                     control={form.control}
                     name="email"
@@ -67,7 +86,7 @@ export const FormLogin = ({ onSuccess }: Props) => {
                                     <input
                                         {...field}
                                         type={showPassword ? "text" : "password"}
-                                        placeholder="Enter your password"
+                                        placeholder="Enter your password (min. 8 characters)"
                                         className="w-full rounded-md border px-3 py-2 pr-10 outline-none"
                                     />
                                     <button
@@ -94,18 +113,18 @@ export const FormLogin = ({ onSuccess }: Props) => {
 
                 <div className="flex justify-end">
                     <Button type="submit" disabled={mutation.isPending}>
-                        {mutation.isPending ? "Signing in..." : "Sign In"}
+                        {mutation.isPending ? "Creating account..." : "Create Account"}
                     </Button>
                 </div>
 
                 <div className="text-center">
                     <p className="text-sm text-gray-600">
-                        Don't have an account?{" "}
+                        Already have an account?{" "}
                         <Link
-                            to="/auth/register"
+                            to="/auth/login"
                             className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
-                            Sign up
+                            Sign in
                         </Link>
                     </p>
                 </div>

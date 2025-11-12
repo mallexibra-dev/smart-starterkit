@@ -1,96 +1,217 @@
-import { OpenAPIHono, createRoute } from '@hono/zod-openapi'
-import { AuthController } from '../controller/auth.controller'
-import { AuthOk, BaseError, BaseOk, LoginBody, MeOk, RefreshBody, RefreshOk, RegisterBody } from '../schemas/auth.schema'
+import { OpenAPIHono, createRoute, z } from '@hono/zod-openapi';
+import { AuthController } from '../controller/auth.controller';
+import { authRateLimit } from '../middlewares/rate-limit.middleware';
+import { validateJson } from '../middlewares/validations.middleware';
+import { registerSchema, loginSchema } from '../../../shared/src/validation/auth.validation';
 
-const router = new OpenAPIHono()
-const controller = new AuthController()
+const app = new OpenAPIHono();
 
-router.openapi(
+// OpenAPI response schemas
+const UserResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+  data: z.object({
+    user: z.object({
+      id: z.number(),
+      name: z.string(),
+      email: z.string(),
+      createdAt: z.string(),
+      updatedAt: z.string(),
+    }),
+  }),
+});
+
+const ErrorResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+
+const MessageResponseSchema = z.object({
+  success: z.boolean(),
+  message: z.string(),
+});
+
+// Apply middleware first
+app.use('/sign-up', authRateLimit, validateJson(registerSchema));
+app.use('/sign-in', authRateLimit, validateJson(loginSchema));
+
+// Sign Up route with OpenAPI documentation
+app.openapi(
   createRoute({
     method: 'post',
-    path: '/register',
+    path: '/auth/sign-up',
+    tags: ['Authentication'],
+    summary: 'Register a new user',
+    description: 'Create a new user account with email and password',
     request: {
-      body: { content: { 'application/json': { schema: RegisterBody } }, required: true },
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              name: z.string(),
+              email: z.string().email(),
+              password: z.string().min(8),
+            }),
+          },
+        },
+      },
     },
     responses: {
-      201: { description: 'Registrasi berhasil', content: { 'application/json': { schema: AuthOk } } },
-      409: { description: 'Conflict', content: { 'application/json': { schema: BaseError } } },
-      422: { description: 'Validasi gagal', content: { 'application/json': { schema: BaseError } } },
-      500: { description: 'Server Error', content: { 'application/json': { schema: BaseError } } },
+      200: {
+        content: {
+          'application/json': {
+            schema: UserResponseSchema,
+          },
+        },
+        description: 'User successfully registered',
+      },
+      400: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Bad request - Validation error or user already exists',
+      },
+      429: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Too many requests',
+      },
     },
-    tags: ['Auth'],
-    summary: 'Register user baru',
   }),
-  (c) => controller.register(c)
-)
+  AuthController.signUp
+);
 
-router.openapi(
+// Sign In route with OpenAPI documentation
+app.openapi(
   createRoute({
     method: 'post',
-    path: '/login',
+    path: '/auth/sign-in',
+    tags: ['Authentication'],
+    summary: 'Sign in user',
+    description: 'Authenticate user with email and password',
     request: {
-      body: { content: { 'application/json': { schema: LoginBody } }, required: true },
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              email: z.string().email(),
+              password: z.string(),
+            }),
+          },
+        },
+      },
     },
     responses: {
-      200: { description: 'Login berhasil', content: { 'application/json': { schema: AuthOk } } },
-      401: { description: 'Kredensial tidak valid', content: { 'application/json': { schema: BaseError } } },
-      422: { description: 'Validasi gagal', content: { 'application/json': { schema: BaseError } } },
-      500: { description: 'Server Error', content: { 'application/json': { schema: BaseError } } },
+      200: {
+        content: {
+          'application/json': {
+            schema: UserResponseSchema,
+          },
+        },
+        description: 'User successfully signed in',
+      },
+      401: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Unauthorized - Invalid credentials',
+      },
+      429: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Too many requests',
+      },
     },
-    tags: ['Auth'],
-    summary: 'Login dengan username/email dan password',
   }),
-  (c) => controller.login(c)
-)
+  AuthController.signIn
+);
 
-router.openapi(
+// Get Current User route with OpenAPI documentation
+app.openapi(
   createRoute({
     method: 'get',
-    path: '/me',
-    security: [{ bearerAuth: [] }],
+    path: '/auth/me',
+    tags: ['Authentication'],
+    summary: 'Get current user',
+    description: 'Get the currently authenticated user information',
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     responses: {
-      200: { description: 'Profil user', content: { 'application/json': { schema: MeOk } } },
-      401: { description: 'Unauthorized', content: { 'application/json': { schema: BaseError } } },
-      404: { description: 'User tidak ditemukan', content: { 'application/json': { schema: BaseError } } },
-      500: { description: 'Server Error', content: { 'application/json': { schema: BaseError } } },
+      200: {
+        content: {
+          'application/json': {
+            schema: UserResponseSchema,
+          },
+        },
+        description: 'Current user information retrieved successfully',
+      },
+      401: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Unauthorized - No or invalid token',
+      },
+      404: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'User not found',
+      },
+      500: {
+        content: {
+          'application/json': {
+            schema: ErrorResponseSchema,
+          },
+        },
+        description: 'Internal server error',
+      },
     },
-    tags: ['Auth'],
-    summary: 'Ambil profil dari access token',
   }),
-  (c) => controller.me(c)
-)
+  AuthController.getCurrentUser
+);
 
-router.openapi(
+// Sign Out route with OpenAPI documentation
+app.openapi(
   createRoute({
     method: 'post',
-    path: '/refresh',
-    request: { body: { content: { 'application/json': { schema: RefreshBody } } } },
+    path: '/auth/sign-out',
+    tags: ['Authentication'],
+    summary: 'Sign out user',
+    description: 'Sign out the current user and clear the authentication cookie',
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     responses: {
-      200: { description: 'Token diperbarui', content: { 'application/json': { schema: RefreshOk } } },
-      400: { description: 'Bad Request', content: { 'application/json': { schema: BaseError } } },
-      401: { description: 'Unauthorized', content: { 'application/json': { schema: BaseError } } },
-      500: { description: 'Server Error', content: { 'application/json': { schema: BaseError } } },
+      200: {
+        content: {
+          'application/json': {
+            schema: MessageResponseSchema,
+          },
+        },
+        description: 'User successfully signed out',
+      },
     },
-    tags: ['Auth'],
-    summary: 'Perbarui access token menggunakan refresh token',
   }),
-  (c) => controller.refresh(c)
-)
+  AuthController.signOut
+);
 
-router.openapi(
-  createRoute({
-    method: 'post',
-    path: '/logout',
-    security: [{ bearerAuth: [] }],
-    responses: {
-      200: { description: 'Logout berhasil', content: { 'application/json': { schema: BaseOk } } },
-      401: { description: 'Unauthorized', content: { 'application/json': { schema: BaseError } } },
-      500: { description: 'Server Error', content: { 'application/json': { schema: BaseError } } },
-    },
-    tags: ['Auth'],
-    summary: 'Logout dan hapus sesi aktif',
-  }),
-  (c) => controller.logout(c)
-)
-
-export default router 
+export default app; 
